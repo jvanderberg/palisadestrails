@@ -1,50 +1,36 @@
 # Palisades Trails
 
-An installable PWA for **Palisades Park**: a general-purpose trail map plus a
-gamified "Trailmaster" challenge. Walk the park, and when your phone's GPS puts
-you within range of a point of interest, add it to your collection. Collect
-enough of them and you unlock a shareable **Trailmaster certificate** to screenshot
-and send in for a t-shirt.
+An installable trail-map PWA for Palisades Park. Browse the trail network and
+curated hikes, follow route directions, locate yourself on the map, collect
+points of interest, and earn Trailmaster certificates.
 
-## Stack
+**[Open Palisades Trails](https://jvanderberg.github.io/palisadestrails/)**
 
-React 19 · TypeScript · Vite · Tailwind CSS v4 · react-leaflet · Zustand ·
-Biome · Vitest.
+## Features
 
-## How the game works
+- Mobile-friendly topographic, street, and USGS basemaps
+- Curated hikes with difficulty, distance, directions, and mapped routes
+- Automatic location updates and proximity-based POI collection
+- Offline app shell and caching for previously viewed map tiles
+- Installable PWA with locally saved progress and shareable certificates
 
-- **Points of interest** live in [`src/data/collectibles.ts`](src/data/collectibles.ts) —
-  edit that one list to add/remove/re-word POIs or change the rules
-  (`GAME_CONFIG.collectRadiusM` and the achievement `TIERS`).
-- **Proximity gating** — a POI is collectable only when the player is within
-  `collectRadiusM` metres (default 40). See [`src/game/proximity.ts`](src/game/proximity.ts).
-- **Persistence** — collected POIs, the player's name, and the claim timestamp
-  are stored in `localStorage` via a Zustand `persist` store
-  ([`src/game/store.ts`](src/game/store.ts)). It's tiny per-device state, so no
-  database is needed; swap the store's backing engine here if you later add a
-  server-side claim registry or leaderboard.
-- **Reward** — reaching the goal opens a canvas-rendered certificate
-  ([`src/lib/certificate.ts`](src/lib/certificate.ts)) with a **Save / Share**
-  button (Web Share API with a PNG, falling back to download).
+## Development
 
-## Develop
+Requires Node.js 24 and npm.
 
 ```bash
 npm install
-npm run dev        # vite dev server
-npm run check      # biome + tsc + vitest (CI gate)
-npm run check:fix  # auto-fix, then check
-npm run build      # tsc -b && vite build  ->  dist/
+npm run dev
+npm run check
+npm run build
 ```
 
-### Testing location without walking the park
+Append `?sim=lat,lon` to simulate a location during development. For example,
+`?sim=42.307439,-86.313926` places the user near Big Pine.
 
-Append `?sim=lat,lon` to the URL to feed a fixed position, e.g.
-`http://localhost:5173/?sim=42.307439,-86.313926` drops you at **Big Pine** so it
-becomes collectable immediately.
+## License
 
-## Data
-
-`src/data/park.json` is baked offline from the Sign-Locations CSV + the
-`Palisades_Park.kml` CalTopo export (43 trails, 50 landmarks, 18 sign posts). To
-refresh it, re-run the parse against updated exports and re-commit the JSON.
+The application shell and software implementation are available under the MIT
+License. Trail geometry, coordinates, landmarks, hike routes and descriptions,
+points of interest, and other map content are excluded from that license and
+remain all rights reserved. See [LICENSE.md](LICENSE.md) for the precise scope.

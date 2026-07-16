@@ -37,7 +37,11 @@ export default function Menu({
 			>
 				<div className="flex items-center justify-between bg-primary px-4 pt-[calc(env(safe-area-inset-top)+12px)] pb-3 text-primary-foreground">
 					<div className="flex items-center gap-2">
-						<span className="text-xl">🍃</span>
+						<img
+							src={`${import.meta.env.BASE_URL}icons/icon.svg`}
+							alt=""
+							className="h-7 w-7 rounded-md"
+						/>
 						<span className="font-bold">Palisades Trails</span>
 					</div>
 					<button type="button" onClick={onClose} aria-label="Close menu" className="p-1">

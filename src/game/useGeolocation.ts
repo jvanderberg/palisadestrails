@@ -17,7 +17,7 @@ interface GeoState {
 	pos: Position | null;
 	/** True while a fresh fix is being fetched (button spinner). */
 	locating: boolean;
-	/** True once continuous tracking is running. */
+	/** True while automatic location refreshes are scheduled. */
 	watching: boolean;
 	error: string | null;
 	/** Changes on each locate; the map flies to it. */
@@ -33,11 +33,10 @@ function readSim(): Position | null {
 }
 
 /**
- * Location. Tapping the button always fetches a fresh fix (maximumAge 0) and
- * recenters the map on it. The first tap also starts `watchPosition`, so the
- * dot keeps updating as the player walks (keeping the collect range live)
- * without needing further taps. A `?sim=` query param short-circuits to a
- * fixed position.
+ * Location refreshes automatically on startup and every 30 seconds. Automatic
+ * fixes move the player dot without recentering the map. Tapping the button
+ * fetches a fresh fix immediately (maximumAge 0) and recenters on it. A
+ * `?sim=` query param short-circuits to a fixed position.
  */
 export function useGeolocation(): GeoState {
 	const sim = useRef<Position | null>(readSim());
@@ -46,60 +45,76 @@ export function useGeolocation(): GeoState {
 	const [watching, setWatching] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [recenter, setRecenter] = useState<Recenter | null>(null);
-	const watchId = useRef<number | null>(null);
+	const intervalId = useRef<number | null>(null);
+	const initialRequested = useRef(false);
 	const nonce = useRef(0);
-
-	useEffect(() => {
-		// Clear the watch on unmount.
-		return () => {
-			if (watchId.current != null) navigator.geolocation.clearWatch(watchId.current);
-		};
-	}, []);
 
 	const recenterOn = useCallback((lat: number, lon: number) => {
 		nonce.current += 1;
 		setRecenter({ lat, lon, nonce: nonce.current });
 	}, []);
 
-	// Start continuous tracking once, so the dot follows the walker.
-	const ensureWatch = useCallback(() => {
-		if (watchId.current != null || sim.current || !('geolocation' in navigator)) return;
-		setWatching(true);
-		watchId.current = navigator.geolocation.watchPosition(
-			(p) =>
-				setPos({ lat: p.coords.latitude, lon: p.coords.longitude, accuracy: p.coords.accuracy }),
-			(err) => setError(err.message),
-			{ enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 },
-		);
-	}, []);
+	const requestPosition = useCallback(
+		(recenterMap: boolean, showBusy: boolean) => {
+			setError(null);
+			if (sim.current) {
+				setPos(sim.current);
+				if (recenterMap) recenterOn(sim.current.lat, sim.current.lon);
+				return;
+			}
+			if (!('geolocation' in navigator)) {
+				setWatching(false);
+				setError('Geolocation is not available on this device.');
+				return;
+			}
+			if (showBusy) setLocating(true);
+			navigator.geolocation.getCurrentPosition(
+				(p) => {
+					if (showBusy) setLocating(false);
+					const np = {
+						lat: p.coords.latitude,
+						lon: p.coords.longitude,
+						accuracy: p.coords.accuracy,
+					};
+					setPos(np);
+					if (recenterMap) recenterOn(np.lat, np.lon);
+				},
+				(err) => {
+					if (showBusy) setLocating(false);
+					setError(err.message);
+				},
+				{ enableHighAccuracy: true, maximumAge: 0, timeout: 15000 },
+			);
+		},
+		[recenterOn],
+	);
 
-	const locate = useCallback(() => {
-		setError(null);
+	useEffect(() => {
 		if (sim.current) {
-			setPos(sim.current);
-			recenterOn(sim.current.lat, sim.current.lon);
+			setWatching(true);
 			return;
 		}
 		if (!('geolocation' in navigator)) {
-			setError('Geolocation is not available on this device.');
+			setWatching(false);
 			return;
 		}
-		ensureWatch();
-		setLocating(true);
-		navigator.geolocation.getCurrentPosition(
-			(p) => {
-				setLocating(false);
-				const np = { lat: p.coords.latitude, lon: p.coords.longitude, accuracy: p.coords.accuracy };
-				setPos(np);
-				recenterOn(np.lat, np.lon);
-			},
-			(err) => {
-				setLocating(false);
-				setError(err.message);
-			},
-			{ enableHighAccuracy: true, maximumAge: 0, timeout: 15000 },
-		);
-	}, [ensureWatch, recenterOn]);
+
+		setWatching(true);
+		// StrictMode reruns effects in development; request the initial fix once,
+		// but recreate the interval after its simulated cleanup.
+		if (!initialRequested.current) {
+			initialRequested.current = true;
+			requestPosition(false, false);
+		}
+		intervalId.current = window.setInterval(() => requestPosition(false, false), 30_000);
+
+		return () => {
+			if (intervalId.current != null) window.clearInterval(intervalId.current);
+			intervalId.current = null;
+		};
+	}, [requestPosition]);
+
+	const locate = useCallback(() => requestPosition(true, true), [requestPosition]);
 
 	return { pos, locating, watching, error, recenter, locate };
 }
