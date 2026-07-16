@@ -1,0 +1,23 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Palisades Trails">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#357a44"/>
+      <stop offset="1" stop-color="#1d4524"/>
+    </linearGradient>
+  </defs>
+  <!-- rounded-square background (purpose: any) -->
+  <rect x="0" y="0" width="512" height="512" rx="112" fill="url(#bg)"/>
+  <g transform="translate(0,-18)">
+    <!-- winding gold trail -->
+    <path d="M138 446 C 190 424, 226 448, 260 440 C 300 430, 328 452, 376 436"
+          fill="none" stroke="#d8b444" stroke-width="28" stroke-linecap="round"/>
+    <!-- trunk -->
+    <rect x="240" y="356" width="32" height="70" rx="8" fill="#d8b444"/>
+    <!-- layered evergreen -->
+    <g fill="#f6f3e9">
+      <polygon points="256,116 188,238 324,238"/>
+      <polygon points="256,174 168,302 344,302"/>
+      <polygon points="256,236 148,374 364,374"/>
+    </g>
+  </g>
+</svg>

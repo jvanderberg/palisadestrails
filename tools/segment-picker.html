@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Palisades — Segment Picker</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  html,body{margin:0;height:100%;font-family:-apple-system,Segoe UI,Roboto,sans-serif}
+  #map{position:absolute;inset:0}
+  #map.splitting{cursor:crosshair}
+  #panel{position:absolute;top:10px;right:10px;width:330px;max-height:calc(100% - 20px);
+    background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:1000;
+    display:flex;flex-direction:column;overflow:hidden}
+  #panel h2{margin:0;padding:12px 14px;background:#2f6b3a;color:#fff;font-size:15px}
+  #panel .hint{padding:8px 14px;font-size:12px;color:#555;background:#f4f6f2;line-height:1.4}
+  #modebar{display:flex;gap:6px;padding:8px 10px;border-bottom:1px solid #eee}
+  #modebar button{flex:1;padding:8px;border:1px solid #ccc;border-radius:8px;cursor:pointer;font-weight:600;background:#fff}
+  #modebar button.on{background:#d6006e;color:#fff;border-color:#d6006e}
+  #meta{padding:6px 14px;font-size:12px;color:#333;background:#f4f6f2}
+  #list{flex:1;overflow-y:auto;padding:6px 10px;min-height:60px}
+  .row{display:flex;align-items:center;gap:8px;padding:6px 6px;border-bottom:1px solid #eee;font-size:13px}
+  .row .n{background:#d6006e;color:#fff;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:11px;flex:0 0 auto}
+  .row .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .g{font-size:11px;color:#c60}
+  .row button{border:none;background:#eee;border-radius:6px;cursor:pointer;padding:2px 7px}
+  #bar{display:flex;gap:6px;padding:10px;border-top:1px solid #eee}
+  #bar button{flex:1;padding:8px;border:none;border-radius:8px;cursor:pointer;font-weight:600}
+  .clr{background:#eee}.exp{background:#2f6b3a;color:#fff}
+  #out{width:100%;height:80px;font:11px monospace;border-top:1px solid #eee;box-sizing:border-box;padding:8px;display:none}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="panel">
+  <h2>Segment Picker</h2>
+  <div class="hint"><b>Select</b>: click segments in walking order (click again to remove).<br /><b>Split</b>: click a spot on a trail to cut it into two.</div>
+  <div id="modebar">
+    <button id="mSelect" class="on" onclick="setMode('select')">Select</button>
+    <button id="mSplit" onclick="setMode('split')">✂ Split</button>
+  </div>
+  <div id="meta">0 segments · 0.00 mi</div>
+  <div id="list"></div>
+  <div id="bar">
+    <button class="clr" onclick="undo()">Undo</button>
+    <button class="clr" onclick="clearAll()">Clear</button>
+    <button class="exp" onclick="doExport()">Export</button>
+  </div>
+  <textarea id="out" readonly onclick="this.select()"></textarea>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="park-data.js"></script>
+<script src="picker.js"></script>
+</body>
+</html>

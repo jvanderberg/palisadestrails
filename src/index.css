@@ -1,0 +1,115 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource-variable/geist";
+
+@theme {
+	--color-background: #f5f3ec;
+	--color-foreground: #23291f;
+	--color-card: #ffffff;
+	--color-card-foreground: #23291f;
+	--color-popover: #ffffff;
+	--color-popover-foreground: #23291f;
+	--color-primary: #2f6b3a;
+	--color-primary-foreground: #ffffff;
+	--color-secondary: #e7e9e0;
+	--color-secondary-foreground: #33402c;
+	--color-muted: #eef0e8;
+	--color-muted-foreground: #6b7566;
+	--color-accent: #dfe6d8;
+	--color-border: #e2ded2;
+	--color-ring: #2f6b3a;
+	--font-sans: "Geist Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+* {
+	-webkit-tap-highlight-color: transparent;
+}
+html,
+body {
+	margin: 0;
+	height: 100%;
+	overscroll-behavior: none;
+	font-family: var(--font-sans);
+}
+
+/* ---- Leaflet marker internals (injected as raw HTML by divIcon) ---- */
+.poi-badge {
+	width: 34px;
+	height: 34px;
+	display: grid;
+	place-items: center;
+	border-radius: 50%;
+	border: 2px solid #fff;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+	font-size: 18px;
+	transition: transform 0.15s ease;
+}
+.poi-badge.locked {
+	background: #fff;
+	opacity: 0.95;
+}
+.poi-badge.near {
+	background: #e9f6ec;
+	border-color: #2f6b3a;
+	animation: poi-pulse 1.4s ease-out infinite;
+}
+.poi-badge.collected {
+	background: #e0a400;
+	color: #fff;
+	border-color: #fff8e6;
+}
+.poi-badge.collected span {
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+@keyframes poi-pulse {
+	0% {
+		box-shadow: 0 0 0 0 rgba(47, 107, 58, 0.55);
+	}
+	100% {
+		box-shadow: 0 0 0 14px rgba(47, 107, 58, 0);
+	}
+}
+.poi-dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: #55607a;
+	border: 2px solid #fff;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+.hike-endpoint {
+	display: grid;
+	place-items: center;
+	width: 52px;
+	height: 22px;
+	border-radius: 999px;
+	border: 2px solid #fff;
+	color: #fff;
+	font-size: 11px;
+	font-weight: 700;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+.hike-endpoint.start {
+	background: #16a34a;
+}
+.hike-endpoint.end {
+	background: #dc2626;
+}
+/* Always-on trail name labels — no tooltip box, white halo for legibility. */
+.leaflet-tooltip.trail-label {
+	background: transparent;
+	border: none;
+	box-shadow: none;
+	padding: 0;
+	color: #234f2c;
+	font-weight: 600;
+	font-size: 11px;
+	white-space: nowrap;
+	text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 4px #fff, 0 1px 2px #fff;
+}
+.leaflet-tooltip.trail-label::before {
+	display: none;
+}
+.leaflet-popup-content {
+	margin: 10px 12px;
+}
