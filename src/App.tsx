@@ -7,8 +7,9 @@ import InstallHelpModal from './components/InstallHelpModal';
 import MapView, { type FitTarget, type FocusTarget, type HikeView } from './components/MapView';
 import Menu from './components/Menu';
 import RewardModal from './components/RewardModal';
+import ShareAppModal from './components/ShareAppModal';
 import { COLLECTIBLES, currentTier, GAME_CONFIG, type Tier } from './data/collectibles';
-import { HIKES, type Hike, hikeEndpoints, hikeTrails } from './data/hikes';
+import { formatHikeTime, HIKES, type Hike, hikeEndpoints, hikeTrails } from './data/hikes';
 import { annotate } from './game/proximity';
 import { selectCount, useGame } from './game/store';
 import { useGeolocation } from './game/useGeolocation';
@@ -18,6 +19,7 @@ export default function App() {
 	const [route, setRoute] = useState('map');
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [installHelpOpen, setInstallHelpOpen] = useState(false);
+	const [shareOpen, setShareOpen] = useState(false);
 	const [focus, setFocus] = useState<FocusTarget | null>(null);
 	const [fit, setFit] = useState<FitTarget | null>(null);
 	// When set, the map shows only this hike's trail portion + Start/Finish.
@@ -111,7 +113,7 @@ export default function App() {
 	const title = activeHike
 		? activeHike.name
 		: route === 'collect'
-			? 'Trailmaster'
+			? 'Trail Mastery'
 			: 'Palisades Trails';
 
 	return (
@@ -191,6 +193,9 @@ export default function App() {
 										<span className="rounded-full bg-secondary px-2.5 py-1">
 											{mapHike.distanceMi.toFixed(1)} mi
 										</span>
+										<span className="rounded-full bg-secondary px-2.5 py-1">
+											{formatHikeTime(mapHike.estimatedMinutes)}
+										</span>
 									</div>
 									<p className="m-0 text-[13px] leading-relaxed">
 										{mapHike.description ?? 'Description coming soon.'}
@@ -246,8 +251,13 @@ export default function App() {
 					setInstallHelpOpen(true);
 					setMenuOpen(false);
 				}}
+				onOpenShare={() => {
+					setShareOpen(true);
+					setMenuOpen(false);
+				}}
 			/>
 			<InstallHelpModal open={installHelpOpen} onClose={() => setInstallHelpOpen(false)} />
+			<ShareAppModal open={shareOpen} onClose={() => setShareOpen(false)} />
 			<RewardModal tier={rewardTier} onClose={() => setRewardTier(null)} />
 			{unlocked ? null : <Gate onPass={unlock} />}
 		</div>

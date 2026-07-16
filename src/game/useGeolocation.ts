@@ -33,10 +33,10 @@ function readSim(): Position | null {
 }
 
 /**
- * Location refreshes automatically on startup and every 30 seconds. Automatic
- * fixes move the player dot without recentering the map. Tapping the button
- * fetches a fresh fix immediately (maximumAge 0) and recenters on it. A
- * `?sim=` query param short-circuits to a fixed position.
+ * A high-accuracy watch stays active to keep the phone's GPS warm. Its latest
+ * fix is published every 30 seconds; the first fix and meaningful accuracy
+ * improvements publish immediately. Tapping the button requests a fresh fix
+ * and recenters on it. A `?sim=` query param short-circuits to a fixed position.
  */
 export function useGeolocation(): GeoState {
 	const sim = useRef<Position | null>(readSim());
@@ -46,7 +46,10 @@ export function useGeolocation(): GeoState {
 	const [error, setError] = useState<string | null>(null);
 	const [recenter, setRecenter] = useState<Recenter | null>(null);
 	const intervalId = useRef<number | null>(null);
-	const initialRequested = useRef(false);
+	const watchId = useRef<number | null>(null);
+	const latestFix = useRef<Position | null>(sim.current);
+	const hasPublished = useRef(Boolean(sim.current));
+	const publishedAccuracy = useRef(sim.current?.accuracy ?? Number.POSITIVE_INFINITY);
 	const nonce = useRef(0);
 
 	const recenterOn = useCallback((lat: number, lon: number) => {
@@ -54,12 +57,23 @@ export function useGeolocation(): GeoState {
 		setRecenter({ lat, lon, nonce: nonce.current });
 	}, []);
 
+	const publishPosition = useCallback(
+		(np: Position, recenterMap: boolean) => {
+			latestFix.current = np;
+			hasPublished.current = true;
+			publishedAccuracy.current = np.accuracy;
+			setPos(np);
+			setError(null);
+			if (recenterMap) recenterOn(np.lat, np.lon);
+		},
+		[recenterOn],
+	);
+
 	const requestPosition = useCallback(
 		(recenterMap: boolean, showBusy: boolean) => {
-			setError(null);
+			if (showBusy) setError(null);
 			if (sim.current) {
-				setPos(sim.current);
-				if (recenterMap) recenterOn(sim.current.lat, sim.current.lon);
+				publishPosition(sim.current, recenterMap);
 				return;
 			}
 			if (!('geolocation' in navigator)) {
@@ -76,17 +90,18 @@ export function useGeolocation(): GeoState {
 						lon: p.coords.longitude,
 						accuracy: p.coords.accuracy,
 					};
-					setPos(np);
-					if (recenterMap) recenterOn(np.lat, np.lon);
+					publishPosition(np, recenterMap);
 				},
 				(err) => {
 					if (showBusy) setLocating(false);
-					setError(err.message);
+					// Scheduled timeouts and temporary unavailability are expected in
+					// deep woods. Surface permission failures and explicit button errors.
+					if (showBusy || err.code === err.PERMISSION_DENIED) setError(err.message);
 				},
-				{ enableHighAccuracy: true, maximumAge: 0, timeout: 15000 },
+				{ enableHighAccuracy: true, maximumAge: 0, timeout: 25_000 },
 			);
 		},
-		[recenterOn],
+		[publishPosition],
 	);
 
 	useEffect(() => {
@@ -98,21 +113,59 @@ export function useGeolocation(): GeoState {
 			setWatching(false);
 			return;
 		}
+		const geolocation = navigator.geolocation;
 
-		setWatching(true);
-		// StrictMode reruns effects in development; request the initial fix once,
-		// but recreate the interval after its simulated cleanup.
-		if (!initialRequested.current) {
-			initialRequested.current = true;
-			requestPosition(false, false);
-		}
-		intervalId.current = window.setInterval(() => requestPosition(false, false), 30_000);
-
-		return () => {
+		const stopTracking = () => {
 			if (intervalId.current != null) window.clearInterval(intervalId.current);
 			intervalId.current = null;
+			if (watchId.current != null) geolocation.clearWatch(watchId.current);
+			watchId.current = null;
+			setWatching(false);
 		};
-	}, [requestPosition]);
+
+		const startTracking = () => {
+			if (document.visibilityState === 'hidden' || watchId.current != null) return;
+			setWatching(true);
+			watchId.current = geolocation.watchPosition(
+				(p) => {
+					const np = {
+						lat: p.coords.latitude,
+						lon: p.coords.longitude,
+						accuracy: p.coords.accuracy,
+					};
+					latestFix.current = np;
+					// Publish the first lock immediately. While the GPS settles, also
+					// publish fixes that improve accuracy by at least 30%.
+					if (!hasPublished.current || np.accuracy <= publishedAccuracy.current * 0.7) {
+						publishPosition(np, false);
+					}
+				},
+				(err) => {
+					if (err.code === err.PERMISSION_DENIED) {
+						stopTracking();
+						setError(err.message);
+					}
+				},
+				{ enableHighAccuracy: true, maximumAge: 5000, timeout: 30_000 },
+			);
+			intervalId.current = window.setInterval(() => {
+				if (latestFix.current) publishPosition(latestFix.current, false);
+			}, 5000);
+		};
+
+		const handleVisibility = () => {
+			if (document.visibilityState === 'hidden') stopTracking();
+			else startTracking();
+		};
+
+		startTracking();
+		document.addEventListener('visibilitychange', handleVisibility);
+
+		return () => {
+			document.removeEventListener('visibilitychange', handleVisibility);
+			stopTracking();
+		};
+	}, [publishPosition]);
 
 	const locate = useCallback(() => requestPosition(true, true), [requestPosition]);
 

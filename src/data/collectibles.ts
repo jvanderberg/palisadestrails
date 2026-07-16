@@ -24,21 +24,25 @@ export interface GameConfig {
 
 export const GAME_CONFIG: GameConfig = {
 	parkName: 'Palisades Park',
-	collectRadiusM: 40,
+	// 200 ft; proximity math remains metric internally.
+	collectRadiusM: 60.96,
 };
 
 export interface Tier {
+	/** Stable identity. Display-title changes must never change this value. */
+	id: `tier-${number}`;
 	/** POIs needed to earn this rank. */
 	count: number;
+	/** User-facing rank name; safe to rename without affecting progress. */
 	title: string;
 }
 
 /** Achievement ranks, ascending. Reach a tier's `count` to earn it; the top
  *  tier is the one you screenshot to send in for the t-shirt. */
 export const TIERS: Tier[] = [
-	{ count: 5, title: 'Trail Blazer' },
-	{ count: 10, title: 'Wayfinder' },
-	{ count: 15, title: 'Trailmaster' },
+	{ id: 'tier-1', count: 5, title: 'Bushwacker' },
+	{ id: 'tier-2', count: 10, title: 'Wayfinder' },
+	{ id: 'tier-3', count: 15, title: 'Trailblazer' },
 ];
 
 /** The highest tier earned at `n` collected (null if below the first). */
@@ -56,6 +60,11 @@ export function nextTier(n: number): Tier | null {
 
 /** The top tier — reaching this earns the t-shirt. */
 export const TOP_TIER: Tier = TIERS[TIERS.length - 1];
+
+/** Whether a rank is the top rank, independent of its title or threshold. */
+export function isTopTier(tier: Tier): boolean {
+	return tier.id === TOP_TIER.id;
+}
 
 export const COLLECTIBLES: Collectible[] = [
 	{

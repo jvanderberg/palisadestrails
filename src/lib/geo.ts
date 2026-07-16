@@ -12,11 +12,11 @@ export function metres(aLat: number, aLon: number, bLat: number, bLon: number): 
 	return 2 * EARTH_RADIUS_M * Math.asin(Math.sqrt(s));
 }
 
-/** Human-readable distance: metres under 1 km, otherwise km to one decimal. */
+/** Human-readable US trail distance. Calculations stay metric internally. */
 export function fmtDist(m: number | null): string {
 	if (m == null) return '—';
-	if (m < 1000) return `${Math.round(m)} m`;
-	return `${(m / 1000).toFixed(1)} km`;
+	const feet = Math.round(m * 3.28084);
+	return `${feet.toLocaleString('en-US')} ft`;
 }
 
 /** Locale-formatted long date for the certificate (e.g. "July 15, 2026"). */

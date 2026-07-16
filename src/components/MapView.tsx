@@ -319,8 +319,8 @@ export default function MapView({
 								</button>
 							) : distance != null ? (
 								<div className="text-xs text-muted-foreground">
-									Get within {GAME_CONFIG.collectRadiusM} m to collect — you're {fmtDist(distance)}{' '}
-									away.
+									Get within {fmtDist(GAME_CONFIG.collectRadiusM)} to collect — you're{' '}
+									{fmtDist(distance)} away.
 								</div>
 							) : (
 								<div className="text-xs text-muted-foreground">

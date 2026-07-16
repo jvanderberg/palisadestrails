@@ -1,6 +1,6 @@
 import { MapPin, Mountain } from 'lucide-react';
 import { COLLECTIBLES } from '../data/collectibles';
-import type { Difficulty, Hike } from '../data/hikes';
+import { type Difficulty, formatHikeTime, type Hike } from '../data/hikes';
 import { useGame } from '../game/store';
 
 interface Props {
@@ -34,6 +34,9 @@ export default function HikeDetail({ hike, onShowOnMap, onOpenPoi }: Props) {
 				) : null}
 				<span className="rounded-full bg-secondary px-2.5 py-1 text-secondary-foreground">
 					{hike.distanceMi.toFixed(1)} mi
+				</span>
+				<span className="rounded-full bg-secondary px-2.5 py-1 text-secondary-foreground">
+					{formatHikeTime(hike.estimatedMinutes)}
 				</span>
 				{stops.length > 0 ? (
 					<span className="rounded-full bg-secondary px-2.5 py-1 text-secondary-foreground">

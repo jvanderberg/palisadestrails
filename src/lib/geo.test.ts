@@ -24,14 +24,11 @@ describe('fmtDist', () => {
 	it('handles null', () => {
 		expect(fmtDist(null)).toBe('—');
 	});
-	it('rounds metres under a km', () => {
-		expect(fmtDist(0)).toBe('0 m');
-		expect(fmtDist(59.4)).toBe('59 m');
-		expect(fmtDist(999)).toBe('999 m');
-	});
-	it('switches to km with one decimal', () => {
-		expect(fmtDist(1000)).toBe('1.0 km');
-		expect(fmtDist(2460)).toBe('2.5 km');
+	it('formats internal metre distances as feet', () => {
+		expect(fmtDist(0)).toBe('0 ft');
+		expect(fmtDist(40)).toBe('131 ft');
+		expect(fmtDist(60.96)).toBe('200 ft');
+		expect(fmtDist(1000)).toBe('3,281 ft');
 	});
 });
 

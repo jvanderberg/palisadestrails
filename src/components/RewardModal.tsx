@@ -1,6 +1,6 @@
 import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
-import { COLLECTIBLES, type Tier, TOP_TIER } from '../data/collectibles';
+import { COLLECTIBLES, isTopTier, type Tier, TOP_TIER } from '../data/collectibles';
 import { selectCount, useGame } from '../game/store';
 import { drawCertificate } from '../lib/certificate';
 
@@ -16,7 +16,7 @@ export default function RewardModal({ tier, onClose }: Props) {
 	const collected = useGame((s) => s.collected);
 	const setName = useGame((s) => s.setName);
 	const count = useGame(selectCount);
-	const isTop = tier?.count === TOP_TIER.count;
+	const isTop = tier ? isTopTier(tier) : false;
 
 	// Repaint whenever the modal opens or the name/collection changes.
 	useEffect(() => {
@@ -98,7 +98,7 @@ export default function RewardModal({ tier, onClose }: Props) {
 					</button>
 					<p className="mt-2 text-center text-xs text-muted-foreground">
 						{isTop
-							? 'Screenshot or save this certificate and send it in to claim your Trailmaster t-shirt.'
+							? `Screenshot or save this certificate and send it in to claim your ${TOP_TIER.title} t-shirt.`
 							: 'Screenshot or save this certificate to share your rank.'}
 					</p>
 				</div>

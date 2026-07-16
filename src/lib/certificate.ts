@@ -1,6 +1,6 @@
 // Draws a rank certificate onto a canvas. Kept framework-free so the same
 // routine renders the on-screen preview and the saved/shared PNG.
-import { GAME_CONFIG, type Tier, TOP_TIER } from '../data/collectibles';
+import { GAME_CONFIG, isTopTier, type Tier } from '../data/collectibles';
 import { fmtDate } from './geo';
 
 export interface CertData {
@@ -83,7 +83,7 @@ export function drawCertificate(canvas: HTMLCanvasElement, data: CertData): void
 	roundRect(g, 128, 128, W - 256, H - 256, 14);
 	g.stroke();
 
-	const isTop = data.tier.count === TOP_TIER.count;
+	const isTop = isTopTier(data.tier);
 	g.textAlign = 'center';
 	g.fillStyle = '#234f2c';
 	g.font = `600 38px ${sans}`;

@@ -1,6 +1,6 @@
-import { ChevronRight, Download, Map as MapIcon, Medal, X } from 'lucide-react';
-import { TIERS, type Tier, TOP_TIER } from '../data/collectibles';
-import { HIKES } from '../data/hikes';
+import { ChevronRight, Download, Map as MapIcon, Medal, Share2, X } from 'lucide-react';
+import { isTopTier, TIERS, type Tier } from '../data/collectibles';
+import { formatHikeTime, HIKES } from '../data/hikes';
 
 interface Props {
 	open: boolean;
@@ -10,6 +10,7 @@ interface Props {
 	onNavigate: (route: string) => void;
 	onOpenCert: (tier: Tier) => void;
 	onOpenInstall: () => void;
+	onOpenShare: () => void;
 }
 
 export default function Menu({
@@ -20,6 +21,7 @@ export default function Menu({
 	onNavigate,
 	onOpenCert,
 	onOpenInstall,
+	onOpenShare,
 }: Props) {
 	return (
 		<>
@@ -69,7 +71,7 @@ export default function Menu({
 						}`}
 					>
 						<span className="flex items-center gap-3">
-							<Medal size={20} /> Trailmaster
+							<Medal size={20} /> Trail Mastery
 						</span>
 						<span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-secondary-foreground">
 							★ {collectedCount}
@@ -85,16 +87,26 @@ export default function Menu({
 						</span>
 						<ChevronRight size={18} className="shrink-0 text-muted-foreground" />
 					</button>
+					<button
+						type="button"
+						onClick={onOpenShare}
+						className="flex w-full items-center justify-between gap-2 border-border/60 border-t px-4 py-3 text-left"
+					>
+						<span className="flex items-center gap-3">
+							<Share2 size={20} /> Share this app
+						</span>
+						<ChevronRight size={18} className="shrink-0 text-muted-foreground" />
+					</button>
 
 					<div className="mt-2 px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
 						Certificates
 					</div>
 					{TIERS.map((t) => {
 						const earned = collectedCount >= t.count;
-						const icon = !earned ? '🔒' : t.count === TOP_TIER.count ? '🏅' : '🎖️';
+						const icon = !earned ? '🔒' : isTopTier(t) ? '🏅' : '🎖️';
 						return earned ? (
 							<button
-								key={t.title}
+								key={t.id}
 								type="button"
 								onClick={() => onOpenCert(t)}
 								className="flex w-full items-center justify-between gap-2 border-border/60 border-t px-4 py-3 text-left"
@@ -107,7 +119,7 @@ export default function Menu({
 							</button>
 						) : (
 							<div
-								key={t.title}
+								key={t.id}
 								className="flex w-full items-center justify-between gap-2 border-border/60 border-t px-4 py-3 text-muted-foreground"
 							>
 								<span className="flex items-center gap-3">
@@ -146,7 +158,7 @@ export default function Menu({
 									</span>
 									<span className="text-xs text-muted-foreground">
 										{h.difficulty ? `${h.difficulty} · ` : ''}
-										{h.distanceMi.toFixed(1)} mi
+										{h.distanceMi.toFixed(1)} mi · {formatHikeTime(h.estimatedMinutes)}
 									</span>
 								</span>
 								<ChevronRight size={18} className="shrink-0 text-muted-foreground" />

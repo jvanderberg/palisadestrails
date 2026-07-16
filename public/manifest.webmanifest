@@ -1,7 +1,7 @@
 {
 	"name": "Palisades Trails",
 	"short_name": "Palisades",
-	"description": "Explore Palisades Park trails, collect points of interest, and earn the Trailmaster t-shirt.",
+	"description": "Explore Palisades Park trails, collect points of interest, and earn trail-mastery ranks.",
 	"start_url": "./",
 	"scope": "./",
 	"display": "standalone",

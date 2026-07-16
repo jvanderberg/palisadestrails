@@ -1,4 +1,11 @@
-import { currentTier, GAME_CONFIG, nextTier, TIERS, TOP_TIER } from '../data/collectibles';
+import {
+	currentTier,
+	GAME_CONFIG,
+	isTopTier,
+	nextTier,
+	TIERS,
+	TOP_TIER,
+} from '../data/collectibles';
 import type { PoiInfo } from '../game/proximity';
 import { selectCount, useGame } from '../game/store';
 import { fmtDist } from '../lib/geo';
@@ -37,7 +44,7 @@ export default function CollectPanel({ pois, onCollect, onFocus, onClaim }: Prop
 						<div className="mt-0.5 text-[13px] text-muted-foreground">
 							{next
 								? `${next.count - count} more to reach ${next.title}`
-								: 'Top rank earned — Trailmaster! 🎉'}
+								: `Top rank earned — ${TOP_TIER.title}! 🎉`}
 						</div>
 					</div>
 					{rank ? (
@@ -46,7 +53,7 @@ export default function CollectPanel({ pois, onCollect, onFocus, onClaim }: Prop
 							onClick={onClaim}
 							className="shrink-0 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground"
 						>
-							{rank.count === TOP_TIER.count ? 'Claim 🎽' : 'Cert 🎖️'}
+							{isTopTier(rank) ? 'Claim 🎽' : 'Cert 🎖️'}
 						</button>
 					) : null}
 				</div>
@@ -66,14 +73,12 @@ export default function CollectPanel({ pois, onCollect, onFocus, onClaim }: Prop
 						const earned = count >= t.count;
 						return (
 							<div
-								key={t.title}
+								key={t.id}
 								className={`flex-1 rounded-lg border p-2 text-center ${
 									earned ? 'border-amber-300 bg-amber-50' : 'border-border bg-secondary/40'
 								}`}
 							>
-								<div className="text-lg">
-									{earned ? (t.count === TOP_TIER.count ? '🏅' : '🎖️') : '🔒'}
-								</div>
+								<div className="text-lg">{earned ? (isTopTier(t) ? '🏅' : '🎖️') : '🔒'}</div>
 								<div className="mt-0.5 truncate font-semibold text-[11px]">{t.title}</div>
 								<div className="text-[10px] text-muted-foreground">{t.count} POIs</div>
 							</div>
@@ -98,7 +103,8 @@ export default function CollectPanel({ pois, onCollect, onFocus, onClaim }: Prop
 			) : closest ? (
 				<div className="mt-3 rounded-xl border border-border bg-card px-4 py-2.5 text-[13px] text-muted-foreground">
 					Closest: <b className="text-foreground">{closest.poi.name}</b> —{' '}
-					{fmtDist(closest.distance)} away. Get within {GAME_CONFIG.collectRadiusM} m to collect.
+					{fmtDist(closest.distance)} away. Get within {fmtDist(GAME_CONFIG.collectRadiusM)} to
+					collect.
 				</div>
 			) : null}
 
@@ -147,7 +153,7 @@ export default function CollectPanel({ pois, onCollect, onFocus, onClaim }: Prop
 			<button
 				type="button"
 				onClick={() => {
-					if (confirm("Reset your collection and Trailmaster progress? This can't be undone."))
+					if (confirm("Reset your collection and trail mastery progress? This can't be undone."))
 						reset();
 				}}
 				className="mt-4 w-full rounded-xl border border-border py-2.5 text-sm text-muted-foreground"

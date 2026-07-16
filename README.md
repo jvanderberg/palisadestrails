@@ -2,7 +2,7 @@
 
 An installable trail-map PWA for Palisades Park. Browse the trail network and
 curated hikes, follow route directions, locate yourself on the map, collect
-points of interest, and earn Trailmaster certificates.
+points of interest, and earn trail-mastery certificates.
 
 **[Open Palisades Trails](https://jvanderberg.github.io/palisadestrails/)**
 

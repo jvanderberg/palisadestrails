@@ -29,6 +29,8 @@ export interface Hike {
 	name: string;
 	/** Length in miles, summed from the traced geometry. */
 	distanceMi: number;
+	/** Difficulty-adjusted hiking time, rounded to five minutes. */
+	estimatedMinutes: number;
 	/** Trail names the route passes through (from the picker Export). */
 	trailNames: string[];
 	/** The traced route, as one continuous polyline. */
@@ -45,6 +47,27 @@ interface BakedHike {
 	difficulty?: Difficulty;
 	description?: string;
 	poiIds?: string[];
+}
+
+const PACE_MIN_PER_MILE: Record<Difficulty, number> = {
+	Easy: 25,
+	Moderate: 30,
+	Hard: 35,
+};
+
+/** Estimate elapsed hiking time from route length and difficulty. */
+export function estimateHikeMinutes(
+	distanceMi: number,
+	difficulty: Difficulty = 'Moderate',
+): number {
+	return Math.max(5, Math.round((distanceMi * PACE_MIN_PER_MILE[difficulty]) / 5) * 5);
+}
+
+export function formatHikeTime(minutes: number): string {
+	if (minutes < 60) return `~${minutes} min`;
+	const hours = Math.floor(minutes / 60);
+	const remainder = minutes % 60;
+	return remainder ? `~${hours} hr ${remainder} min` : `~${hours} hr`;
 }
 
 // distanceMi and poiIds are derived from the geometry below. The newer loops
@@ -232,10 +255,12 @@ function closeLoop(coords: LatLng[]): LatLng[] {
 
 export const HIKES: Hike[] = BAKED.map((b) => {
 	const coords = closeLoop(b.route.coords as unknown as LatLng[]);
+	const distanceMi = Math.round((trailMetres(coords) / 1609.344) * 100) / 100;
 	return {
 		id: b.id,
 		name: b.name,
-		distanceMi: Math.round((trailMetres(coords) / 1609.344) * 100) / 100,
+		distanceMi,
+		estimatedMinutes: estimateHikeMinutes(distanceMi, b.difficulty),
 		trailNames: [...new Set(b.route.names)],
 		segments: [coords],
 		difficulty: b.difficulty,

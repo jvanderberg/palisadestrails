@@ -22,6 +22,13 @@ describe('useGame', () => {
 		expect(currentTier(selectCount(useGame.getState()))?.title).toBe(TIERS[2].title);
 	});
 
+	it('keeps rank display names out of persisted progress', () => {
+		for (let i = 0; i < TIERS[0].count; i++) useGame.getState().collect(`poi-${i}`);
+		const persisted = localStorage.getItem('palisades-trails/v1');
+		expect(persisted).not.toBeNull();
+		for (const tier of TIERS) expect(persisted).not.toContain(tier.title);
+	});
+
 	it('uncollect and reset clear state', () => {
 		useGame.getState().collect('a');
 		useGame.getState().collect('b');
