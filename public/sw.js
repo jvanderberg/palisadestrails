@@ -1,10 +1,11 @@
 // Minimal offline cache. Vite fingerprints the app bundle, so we cache at
 // runtime (stale-while-revalidate for same-origin, cache-first for OSM
 // tiles) rather than precaching a hard-coded list.
-// Bump APP_CACHE when shipping a new app shell so activation removes old
-// un-hashed resources. Keep TILE_CACHE stable so updates do not discard the
-// user's downloaded offline map area.
-const APP_CACHE = 'palisades-app-v4';
+// The production build replaces this placeholder with its commit/build ID.
+// That changes the worker and app-cache name on every release, while the tile
+// cache stays stable so updates do not discard downloaded offline map areas.
+const BUILD_ID = '__PALISADES_BUILD_ID__';
+const APP_CACHE = `palisades-app-${BUILD_ID}`;
 const TILE_CACHE = 'palisades-tiles-v3';
 
 self.addEventListener('install', () => self.skipWaiting());
@@ -18,7 +19,17 @@ self.addEventListener('activate', (event) => {
 					keys.filter((k) => k !== APP_CACHE && k !== TILE_CACHE).map((k) => caches.delete(k)),
 				),
 			)
-			.then(() => self.clients.claim()),
+			.then(() => self.clients.claim())
+			// An installed iOS PWA may resume its old document without navigating.
+			// Refresh controlled windows as soon as this newly stamped worker takes over.
+			.then(() => self.clients.matchAll({ type: 'window' }))
+			.then((clients) =>
+				Promise.all(
+					clients.map((client) =>
+						typeof client.navigate === 'function' ? client.navigate(client.url) : undefined,
+					),
+				),
+			),
 	);
 });
 
@@ -52,7 +63,7 @@ self.addEventListener('fetch', (event) => {
 	// Fall back to cache only when offline.
 	if (request.mode === 'navigate') {
 		event.respondWith(
-			fetch(request)
+			fetch(request, { cache: 'no-store' })
 				.then((res) => {
 					caches.open(APP_CACHE).then((c) => c.put(request, res.clone()));
 					return res;

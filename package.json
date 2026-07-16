@@ -7,7 +7,7 @@
 		"dev": "vite",
 		"map": "node scripts/build-park.mjs",
 		"icons": "node scripts/build-icons.mjs",
-		"build": "tsc -b && vite build",
+		"build": "tsc -b && vite build && node scripts/stamp-sw.mjs",
 		"preview": "vite preview",
 		"test": "vitest run",
 		"check": "biome check . && tsc -b && vitest run",
