@@ -1,4 +1,4 @@
-import { ChevronRight, Map as MapIcon, Medal, X } from 'lucide-react';
+import { ChevronRight, Download, Map as MapIcon, Medal, X } from 'lucide-react';
 import { TIERS, type Tier, TOP_TIER } from '../data/collectibles';
 import { HIKES } from '../data/hikes';
 
@@ -9,6 +9,7 @@ interface Props {
 	onClose: () => void;
 	onNavigate: (route: string) => void;
 	onOpenCert: (tier: Tier) => void;
+	onOpenInstall: () => void;
 }
 
 export default function Menu({
@@ -18,6 +19,7 @@ export default function Menu({
 	onClose,
 	onNavigate,
 	onOpenCert,
+	onOpenInstall,
 }: Props) {
 	return (
 		<>
@@ -72,6 +74,16 @@ export default function Menu({
 						<span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-secondary-foreground">
 							★ {collectedCount}
 						</span>
+					</button>
+					<button
+						type="button"
+						onClick={onOpenInstall}
+						className="flex w-full items-center justify-between gap-2 border-border/60 border-t px-4 py-3 text-left"
+					>
+						<span className="flex items-center gap-3">
+							<Download size={20} /> Installing this app
+						</span>
+						<ChevronRight size={18} className="shrink-0 text-muted-foreground" />
 					</button>
 
 					<div className="mt-2 px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">

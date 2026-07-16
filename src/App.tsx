@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import CollectPanel from './components/CollectPanel';
 import Gate from './components/Gate';
 import HikeDetail from './components/HikeDetail';
+import InstallHelpModal from './components/InstallHelpModal';
 import MapView, { type FitTarget, type FocusTarget, type HikeView } from './components/MapView';
 import Menu from './components/Menu';
 import RewardModal from './components/RewardModal';
@@ -16,6 +17,7 @@ export default function App() {
 	// Route is 'map', 'collect', or `hike:<id>`.
 	const [route, setRoute] = useState('map');
 	const [menuOpen, setMenuOpen] = useState(false);
+	const [installHelpOpen, setInstallHelpOpen] = useState(false);
 	const [focus, setFocus] = useState<FocusTarget | null>(null);
 	const [fit, setFit] = useState<FitTarget | null>(null);
 	// When set, the map shows only this hike's trail portion + Start/Finish.
@@ -240,7 +242,12 @@ export default function App() {
 					setRewardTier(t);
 					setMenuOpen(false);
 				}}
+				onOpenInstall={() => {
+					setInstallHelpOpen(true);
+					setMenuOpen(false);
+				}}
 			/>
+			<InstallHelpModal open={installHelpOpen} onClose={() => setInstallHelpOpen(false)} />
 			<RewardModal tier={rewardTier} onClose={() => setRewardTier(null)} />
 			{unlocked ? null : <Gate onPass={unlock} />}
 		</div>
