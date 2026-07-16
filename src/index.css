@@ -95,6 +95,11 @@ body {
 .hike-endpoint.end {
 	background: #dc2626;
 }
+/* A closed loop's coincident start+finish, rendered as one pill. */
+.hike-endpoint.startfinish {
+	width: 84px;
+	background: #2f6b3a;
+}
 /* Always-on trail name labels — no tooltip box, white halo for legibility. */
 .leaflet-tooltip.trail-label {
 	background: transparent;

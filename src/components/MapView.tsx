@@ -3,7 +3,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
 	Circle,
 	CircleMarker,
-	LayersControl,
 	MapContainer,
 	Marker,
 	Polyline,
@@ -17,11 +16,48 @@ import { GAME_CONFIG } from '../data/collectibles';
 import { type LatLng, park } from '../data/park';
 import type { PoiInfo } from '../game/proximity';
 import type { Position, Recenter } from '../game/useGeolocation';
-import { fmtDist } from '../lib/geo';
+import { fmtDist, metres } from '../lib/geo';
 import { endpointIcon, landmarkIcon, poiIcon } from '../lib/markers';
+import BasemapSwitcher, { type BasemapOption } from './BasemapSwitcher';
 
 /** Only show the (43) permanent trail labels once zoomed in enough to read them. */
 const LABEL_MIN_ZOOM = 16;
+
+/** Available basemaps — the switcher and the active tile layer both read this. */
+const BASEMAPS: (BasemapOption & {
+	url: string;
+	attribution: string;
+	maxNativeZoom?: number;
+	maxZoom: number;
+})[] = [
+	{
+		name: 'USGS Topo',
+		label: 'USGS Topo',
+		swatch: 'linear-gradient(135deg,#d7e8c8,#b8cf9f)',
+		url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',
+		attribution: '&copy; USGS The National Map',
+		maxNativeZoom: 16,
+		maxZoom: 19,
+	},
+	{
+		name: 'Topographic',
+		label: 'OpenTopo',
+		swatch: 'linear-gradient(135deg,#efe1bf,#d8b98a)',
+		url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+		attribution:
+			'&copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA) · &copy; OpenStreetMap',
+		maxNativeZoom: 17,
+		maxZoom: 19,
+	},
+	{
+		name: 'Street',
+		label: 'Street',
+		swatch: 'linear-gradient(135deg,#dfe6ee,#b9c6d6)',
+		url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+		attribution: '&copy; OpenStreetMap',
+		maxZoom: 19,
+	},
+];
 
 export interface FocusTarget {
 	id: string;
@@ -106,18 +142,12 @@ function readBasemap(): string {
 	}
 }
 
-/** Remembers the chosen basemap across reloads. */
-function BasemapWatcher() {
-	useMapEvents({
-		baselayerchange: (e) => {
-			try {
-				localStorage.setItem(BASEMAP_KEY, e.name);
-			} catch {
-				// ignore
-			}
-		},
-	});
-	return null;
+function writeBasemap(name: string) {
+	try {
+		localStorage.setItem(BASEMAP_KEY, name);
+	} catch {
+		// ignore
+	}
 }
 
 /** Flies to the player's location on each locate-button tap. */
@@ -158,7 +188,12 @@ export default function MapView({
 	const bounds = useMemo(() => L.latLngBounds(park.bounds), []);
 	const [zoom, setZoom] = useState(0);
 	const showLabels = zoom >= LABEL_MIN_ZOOM;
-	const [savedBasemap] = useState(readBasemap);
+	const [basemap, setBasemap] = useState(readBasemap);
+	const changeBasemap = (name: string) => {
+		setBasemap(name);
+		writeBasemap(name);
+	};
+	const active = BASEMAPS.find((b) => b.name === basemap) ?? BASEMAPS[0];
 
 	const register = (key: string) => (m: L.Marker | null) => {
 		if (m) markers.current.set(key, m);
@@ -166,157 +201,159 @@ export default function MapView({
 	};
 
 	return (
-		<MapContainer
-			bounds={bounds}
-			boundsOptions={{ padding: [30, 30] }}
-			className="h-full w-full"
-			zoomControl
-		>
-			<LayersControl position="topright">
-				<LayersControl.BaseLayer checked={savedBasemap === 'USGS Topo'} name="USGS Topo">
-					<TileLayer
-						attribution="&copy; USGS The National Map"
-						url="https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}"
-						maxNativeZoom={16}
-						maxZoom={19}
-					/>
-				</LayersControl.BaseLayer>
-				<LayersControl.BaseLayer checked={savedBasemap === 'Topographic'} name="Topographic">
-					<TileLayer
-						attribution='&copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA) · &copy; OpenStreetMap'
-						url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
-						maxNativeZoom={17}
-						maxZoom={19}
-					/>
-				</LayersControl.BaseLayer>
-				<LayersControl.BaseLayer checked={savedBasemap === 'Street'} name="Street">
-					<TileLayer
-						attribution="&copy; OpenStreetMap"
-						url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-						maxZoom={19}
-					/>
-				</LayersControl.BaseLayer>
-			</LayersControl>
+		<div className="relative h-full w-full">
+			<MapContainer
+				bounds={bounds}
+				boundsOptions={{ padding: [30, 30] }}
+				className="h-full w-full"
+				zoomControl
+			>
+				<TileLayer
+					key={active.name}
+					attribution={active.attribution}
+					url={active.url}
+					maxNativeZoom={active.maxNativeZoom}
+					maxZoom={active.maxZoom}
+				/>
 
-			{hikeView ? (
-				<>
-					{hikeView.trails.map((coords) => (
+				{hikeView ? (
+					<>
+						{hikeView.trails.map((coords) => (
+							<Polyline
+								key={`hikeseg-${coords[0]?.join(',')}-${coords[coords.length - 1]?.join(',')}`}
+								positions={coords}
+								pathOptions={{
+									color: '#d6006e',
+									weight: 6,
+									opacity: 0.95,
+									lineCap: 'round',
+									lineJoin: 'round',
+								}}
+							/>
+						))}
+						{hikeView.start &&
+						hikeView.end &&
+						metres(hikeView.start[0], hikeView.start[1], hikeView.end[0], hikeView.end[1]) < 15 ? (
+							<Marker
+								position={hikeView.start}
+								icon={endpointIcon('startfinish')}
+								zIndexOffset={1100}
+							>
+								<Popup>Start / Finish · {hikeView.name}</Popup>
+							</Marker>
+						) : (
+							<>
+								{hikeView.start ? (
+									<Marker
+										position={hikeView.start}
+										icon={endpointIcon('start')}
+										zIndexOffset={1100}
+									>
+										<Popup>Start · {hikeView.name}</Popup>
+									</Marker>
+								) : null}
+								{hikeView.end ? (
+									<Marker position={hikeView.end} icon={endpointIcon('end')} zIndexOffset={1100}>
+										<Popup>Finish · {hikeView.name}</Popup>
+									</Marker>
+								) : null}
+							</>
+						)}
+					</>
+				) : (
+					park.trails.map((t) => (
 						<Polyline
-							key={`hikeseg-${coords[0]?.join(',')}-${coords[coords.length - 1]?.join(',')}`}
-							positions={coords}
+							key={`trail-${t.name}-${t.coords[0]?.join(',')}`}
+							positions={t.coords}
 							pathOptions={{
-								color: '#d6006e',
-								weight: 6,
-								opacity: 0.95,
+								color: t.color === '#000000' ? '#3d4a33' : t.color,
+								weight: 4,
+								opacity: 0.85,
 								lineCap: 'round',
 								lineJoin: 'round',
 							}}
-						/>
-					))}
-					{hikeView.start ? (
-						<Marker position={hikeView.start} icon={endpointIcon('start')} zIndexOffset={1100}>
-							<Popup>Start · {hikeView.name}</Popup>
-						</Marker>
-					) : null}
-					{hikeView.end ? (
-						<Marker position={hikeView.end} icon={endpointIcon('end')} zIndexOffset={1100}>
-							<Popup>Finish · {hikeView.name}</Popup>
-						</Marker>
-					) : null}
-				</>
-			) : (
-				park.trails.map((t) => (
-					<Polyline
-						key={`trail-${t.name}-${t.coords[0]?.join(',')}`}
-						positions={t.coords}
-						pathOptions={{
-							color: t.color === '#000000' ? '#3d4a33' : t.color,
-							weight: 4,
-							opacity: 0.85,
-							lineCap: 'round',
-							lineJoin: 'round',
-						}}
+						>
+							{showLabels ? (
+								<Tooltip permanent direction="center" className="trail-label">
+									{t.name}
+								</Tooltip>
+							) : null}
+						</Polyline>
+					))
+				)}
+
+				{park.points.map((p) => (
+					<Marker
+						key={`lm-${p.name}-${p.lat}-${p.lon}`}
+						position={[p.lat, p.lon]}
+						icon={landmarkIcon()}
 					>
-						{showLabels ? (
-							<Tooltip permanent direction="center" className="trail-label">
-								{t.name}
-							</Tooltip>
-						) : null}
-					</Polyline>
-				))
-			)}
+						<Popup>{p.name}</Popup>
+					</Marker>
+				))}
 
-			{park.points.map((p) => (
-				<Marker
-					key={`lm-${p.name}-${p.lat}-${p.lon}`}
-					position={[p.lat, p.lon]}
-					icon={landmarkIcon()}
-				>
-					<Popup>{p.name}</Popup>
-				</Marker>
-			))}
+				{pois.map(({ poi, distance, state }) => (
+					<Marker
+						key={`poi-${poi.id}`}
+						position={[poi.lat, poi.lon]}
+						icon={poiIcon(poi, state)}
+						zIndexOffset={1000}
+						ref={register(`poi:${poi.id}`)}
+					>
+						<Popup>
+							<h3 className="m-0 mb-1 text-sm font-semibold">
+								{poi.emoji} {poi.name}
+							</h3>
+							{poi.hint ? (
+								<p className="mt-0 mb-1.5 text-xs text-muted-foreground">{poi.hint}</p>
+							) : null}
+							{state === 'collected' ? (
+								<div className="font-semibold text-primary">✓ Collected</div>
+							) : state === 'near' ? (
+								<button
+									type="button"
+									className="w-full rounded-lg bg-primary px-3 py-1.5 font-semibold text-primary-foreground"
+									onClick={() => onCollect(poi.id)}
+								>
+									Add to collection ✦
+								</button>
+							) : distance != null ? (
+								<div className="text-xs text-muted-foreground">
+									Get within {GAME_CONFIG.collectRadiusM} m to collect — you're {fmtDist(distance)}{' '}
+									away.
+								</div>
+							) : (
+								<div className="text-xs text-muted-foreground">
+									Turn on location (◎) to collect when you're close.
+								</div>
+							)}
+						</Popup>
+					</Marker>
+				))}
 
-			{pois.map(({ poi, distance, state }) => (
-				<Marker
-					key={`poi-${poi.id}`}
-					position={[poi.lat, poi.lon]}
-					icon={poiIcon(poi, state)}
-					zIndexOffset={1000}
-					ref={register(`poi:${poi.id}`)}
-				>
-					<Popup>
-						<h3 className="m-0 mb-1 text-sm font-semibold">
-							{poi.emoji} {poi.name}
-						</h3>
-						{poi.hint ? (
-							<p className="mt-0 mb-1.5 text-xs text-muted-foreground">{poi.hint}</p>
-						) : null}
-						{state === 'collected' ? (
-							<div className="font-semibold text-primary">✓ Collected</div>
-						) : state === 'near' ? (
-							<button
-								type="button"
-								className="w-full rounded-lg bg-primary px-3 py-1.5 font-semibold text-primary-foreground"
-								onClick={() => onCollect(poi.id)}
-							>
-								Add to collection ✦
-							</button>
-						) : distance != null ? (
-							<div className="text-xs text-muted-foreground">
-								Get within {GAME_CONFIG.collectRadiusM} m to collect — you're {fmtDist(distance)}{' '}
-								away.
-							</div>
-						) : (
-							<div className="text-xs text-muted-foreground">
-								Turn on location (◎) to collect when you're close.
-							</div>
-						)}
-					</Popup>
-				</Marker>
-			))}
+				{pos ? (
+					<>
+						<Circle
+							center={[pos.lat, pos.lon]}
+							radius={pos.accuracy || 0}
+							pathOptions={{ color: '#2f6bd6', weight: 1, fillColor: '#2f6bd6', fillOpacity: 0.12 }}
+							interactive={false}
+						/>
+						<CircleMarker
+							center={[pos.lat, pos.lon]}
+							radius={8}
+							pathOptions={{ color: '#fff', weight: 3, fillColor: '#2f6bd6', fillOpacity: 1 }}
+						/>
+					</>
+				) : null}
 
-			{pos ? (
-				<>
-					<Circle
-						center={[pos.lat, pos.lon]}
-						radius={pos.accuracy || 0}
-						pathOptions={{ color: '#2f6bd6', weight: 1, fillColor: '#2f6bd6', fillOpacity: 0.12 }}
-						interactive={false}
-					/>
-					<CircleMarker
-						center={[pos.lat, pos.lon]}
-						radius={8}
-						pathOptions={{ color: '#fff', weight: 3, fillColor: '#2f6bd6', fillOpacity: 1 }}
-					/>
-				</>
-			) : null}
-
-			<FocusController focus={focus} markers={markers.current} />
-			<FitController fit={fit} />
-			<RecenterController recenter={recenter} />
-			<ResizeController visible={visible} />
-			<ZoomWatcher onZoom={setZoom} />
-			<BasemapWatcher />
-		</MapContainer>
+				<FocusController focus={focus} markers={markers.current} />
+				<FitController fit={fit} />
+				<RecenterController recenter={recenter} />
+				<ResizeController visible={visible} />
+				<ZoomWatcher onZoom={setZoom} />
+			</MapContainer>
+			<BasemapSwitcher value={basemap} options={BASEMAPS} onChange={changeBasemap} />
+		</div>
 	);
 }

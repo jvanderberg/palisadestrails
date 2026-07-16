@@ -51,6 +51,14 @@ interface BakedHike {
 // (no difficulty/description yet) get those filled in per hike after review.
 const BAKED: BakedHike[] = [
 	{
+		id: 'fern-loop',
+		name: 'Fern Loop',
+		route: fernLoop,
+		difficulty: 'Easy',
+		description:
+			'Start at the meadow entrance to the Brandywine Trail, go left at the Fern Loop sign, and go right at the next intersection to take the Brandywine Trail back out.',
+	},
+	{
 		id: 'grand-tour',
 		name: 'The Grand Tour',
 		route: grandTour,
@@ -82,13 +90,54 @@ const BAKED: BakedHike[] = [
 		description:
 			'Down off Thunder Mountain, past the Jack Gardner trailhead and along the east sugar bowl and ridge into the Sugar Bowl.',
 	},
-	{ id: 'fern-loop', name: 'Fern Loop', route: fernLoop },
-	{ id: 'oak-loop', name: 'Oak Loop', route: oakLoop },
-	{ id: 'north-end-loop', name: 'North End Loop Tour', route: northEndLoop },
-	{ id: 'northern-lower-loop', name: 'The Northern Lower Loop', route: northernLowerLoop },
-	{ id: 'hemlock-loop', name: 'Hemlock Loop', route: hemlockLoop },
-	{ id: 'big-pine-loop', name: 'Big Pine Loop', route: bigPineLoop },
-	{ id: 'south-end-loop', name: 'South End Loop Tour', route: southEndLoop },
+	{
+		id: 'oak-loop',
+		name: 'Oak Loop',
+		route: oakLoop,
+		difficulty: 'Moderate',
+		description:
+			"Start at the trail entrance across from the softball field, cross the Wood Bridge, and turn right. Stay on the Brandywine Trail. Follow the 'To Oak Loop' signs up the ridge. Turn right at the top, then left at the next intersection. Hike the Oak Loop until you come out on Edgewater Road. Take the short connector behind the cottage back to the Brandywine Trail.",
+	},
+	{
+		id: 'north-end-loop',
+		name: 'North End Loop Tour',
+		route: northEndLoop,
+		difficulty: 'Moderate',
+		description:
+			'Start at the meadow entrance to the Brandywine Trail. Take the Brandywine Trail to Sassafras Trail, then to Upper Sassafras Loop. Follow Oak Loop out to Edgewater Road. Take the Brandywine Connector to the left of the cottage, then turn right on the Brandywine Trail back to the meadow.',
+	},
+	{
+		id: 'northern-lower-loop',
+		name: 'The Northern Lower Loop',
+		route: northernLowerLoop,
+		difficulty: 'Moderate',
+		description:
+			'Start at the trail entrance across from the softball field. Cross the Wood Bridge and turn right. Take the Brandywine Trail to Sassafras Trail, then follow the signs to Lower Maple Loop. At the next intersection, follow the sign to High Point and hike up the ridge. Follow the signs to Oak Ridge. Take Oak Ridge out to Edgewater Road. Take the connector to the left of the cottage back to the Brandywine Trail. Turn left at the Brandywine Trail, cross the bridge, and you are done.',
+	},
+	{
+		id: 'hemlock-loop',
+		name: 'Hemlock Loop',
+		route: hemlockLoop,
+		difficulty: 'Easy',
+		description:
+			"Start at Ravine Road by the tennis courts. To the right of the cottage, you'll find Stagecoach Trail. Hike up and turn left at the intersection. Enjoy the rolling route through the hemlocks. At the next intersection, follow the signs to Stagecoach Trail, then turn right on Stagecoach Trail to exit.",
+	},
+	{
+		id: 'big-pine-loop',
+		name: 'Big Pine Loop',
+		route: bigPineLoop,
+		difficulty: 'Easy',
+		description:
+			'Start at the Jack Gardner Trailhead sign. Hike in and follow the signs to Big Pine Ridge Trail. Hike the ridge, noting how steep it is off to the left. At the next intersection, follow the sign to Big Pine. Take Big Pine Trail to Red Pine Loop, then head back out to the Gardner Trailhead.',
+	},
+	{
+		id: 'south-end-loop',
+		name: 'South End Loop Tour',
+		route: southEndLoop,
+		difficulty: 'Moderate',
+		description:
+			'Start at the Gardner Trailhead. Follow the signs to Big Pine Ridge Trail. Hike the ridge and, at the next two intersections, follow the signs to the Sugar Bowl. Summit the East Sugar Bowl and enjoy the view. Go right, following North Ridge Trail. Take a short detour to the best view in the park. Continue on North Ridge Trail out to the Sugar Bowl.',
+	},
 ];
 
 function trailMetres(coords: LatLng[]): number {
@@ -99,9 +148,12 @@ function trailMetres(coords: LatLng[]): number {
 	return m;
 }
 
-/** A POI counts as "on" a hike when the traced route passes within this many
- *  metres of it — a spur to a nearby point doesn't make it part of the route. */
-const HIKE_CORRIDOR_M = 100;
+/** A POI counts as "on" a hike only when the traced route passes within this
+ *  many metres of it. The route geometry is exact, so this is tight — genuine
+ *  on-route POIs sit within a few metres; anything tens of metres off is a
+ *  nearby spur, not on the hike. (The 40 m collect radius is for GPS slop, not
+ *  this.) */
+const HIKE_CORRIDOR_M = 20;
 
 /**
  * The POIs a traced route actually passes, in hiking order. Distances are

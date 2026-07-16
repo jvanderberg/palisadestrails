@@ -25,13 +25,15 @@ export function landmarkIcon(): L.DivIcon {
 	});
 }
 
-export function endpointIcon(kind: 'start' | 'end'): L.DivIcon {
-	const label = kind === 'start' ? 'Start' : 'Finish';
+export function endpointIcon(kind: 'start' | 'end' | 'startfinish'): L.DivIcon {
+	const label = kind === 'start' ? 'Start' : kind === 'end' ? 'Finish' : 'Start / Finish';
+	// The combined marker needs a wider pill to fit its label.
+	const w = kind === 'startfinish' ? 84 : 52;
 	return L.divIcon({
 		className: '',
 		html: `<div class="hike-endpoint ${kind}">${label}</div>`,
-		iconSize: [52, 22],
-		iconAnchor: [26, 26],
+		iconSize: [w, 22],
+		iconAnchor: [w / 2, 26],
 		popupAnchor: [0, -24],
 	});
 }

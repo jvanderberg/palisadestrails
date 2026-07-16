@@ -1,7 +1,10 @@
 // Minimal offline cache. Vite fingerprints the app bundle, so we cache at
 // runtime (stale-while-revalidate for same-origin, cache-first for OSM
 // tiles) rather than precaching a hard-coded list.
-const APP_CACHE = 'palisades-app-v3';
+// Bump APP_CACHE when shipping a new app shell so activation removes old
+// un-hashed resources. Keep TILE_CACHE stable so updates do not discard the
+// user's downloaded offline map area.
+const APP_CACHE = 'palisades-app-v4';
 const TILE_CACHE = 'palisades-tiles-v3';
 
 self.addEventListener('install', () => self.skipWaiting());

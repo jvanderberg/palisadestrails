@@ -1,4 +1,4 @@
-import { Menu as MenuIcon } from 'lucide-react';
+import { Info, Menu as MenuIcon } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import CollectPanel from './components/CollectPanel';
 import Gate from './components/Gate';
@@ -20,6 +20,7 @@ export default function App() {
 	const [fit, setFit] = useState<FitTarget | null>(null);
 	// When set, the map shows only this hike's trail portion + Start/Finish.
 	const [mapHikeId, setMapHikeId] = useState<string | null>(null);
+	const [mapDetailsOpen, setMapDetailsOpen] = useState(false);
 	// Which rank's certificate is showing (null = closed).
 	const [rewardTier, setRewardTier] = useState<Tier | null>(null);
 	const [toast, setToast] = useState<string | null>(null);
@@ -40,12 +41,16 @@ export default function App() {
 		? HIKES.find((h) => h.id === route.slice(5))
 		: undefined;
 
+	const mapHike = useMemo(
+		() => (mapHikeId ? HIKES.find((h) => h.id === mapHikeId) : undefined),
+		[mapHikeId],
+	);
 	const hikeView: HikeView | null = useMemo(() => {
-		const h = mapHikeId ? HIKES.find((x) => x.id === mapHikeId) : undefined;
+		const h = mapHike;
 		if (!h) return null;
 		const { start, end } = hikeEndpoints(h);
 		return { name: h.name, trails: hikeTrails(h), start, end };
-	}, [mapHikeId]);
+	}, [mapHike]);
 
 	const flash = useCallback((msg: string) => {
 		setToast(msg);
@@ -96,6 +101,7 @@ export default function App() {
 	const showHikeOnMap = useCallback((hike: Hike) => {
 		const coords = hikeTrails(hike).flat();
 		setMapHikeId(hike.id);
+		setMapDetailsOpen(false);
 		setRoute('map');
 		if (coords.length > 0) setFit((f) => ({ coords, nonce: (f?.nonce ?? 0) + 1 }));
 	}, []);
@@ -146,16 +152,49 @@ export default function App() {
 						visible={route === 'map'}
 						onCollect={handleCollect}
 					/>
-					{hikeView ? (
-						<div className="-translate-x-1/2 absolute top-3 left-1/2 z-[600] flex max-w-[92%] items-center gap-2 rounded-full bg-primary/95 py-1.5 pr-1.5 pl-4 text-sm text-primary-foreground shadow-lg">
-							<span className="truncate font-semibold">{hikeView.name}</span>
-							<button
-								type="button"
-								onClick={() => setMapHikeId(null)}
-								className="shrink-0 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold"
-							>
-								Show all trails
-							</button>
+					{hikeView && mapHike ? (
+						<div className="-translate-x-1/2 absolute top-20 left-1/2 z-[600] w-[calc(100%-1.5rem)] max-w-md overflow-hidden rounded-2xl bg-primary/95 text-sm text-primary-foreground shadow-lg sm:top-3">
+							<div className="flex items-center gap-2 py-1.5 pr-1.5 pl-3">
+								<button
+									type="button"
+									onClick={() => setMapDetailsOpen((open) => !open)}
+									aria-expanded={mapDetailsOpen}
+									className="flex min-w-0 flex-1 items-center gap-2 rounded-full px-1 py-1 text-left"
+								>
+									<Info size={16} className="shrink-0" />
+									<span className="truncate font-semibold">{hikeView.name}</span>
+									<span className="shrink-0 text-xs opacity-80">
+										{mapDetailsOpen ? 'Hide details' : 'Details'}
+									</span>
+								</button>
+								<button
+									type="button"
+									onClick={() => {
+										setMapHikeId(null);
+										setMapDetailsOpen(false);
+									}}
+									className="shrink-0 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold"
+								>
+									Show all trails
+								</button>
+							</div>
+							{mapDetailsOpen ? (
+								<div className="border-white/20 border-t bg-white px-4 py-3 text-foreground">
+									<div className="mb-2 flex items-center gap-2 text-xs font-semibold">
+										{mapHike.difficulty ? (
+											<span className="rounded-full bg-secondary px-2.5 py-1">
+												{mapHike.difficulty}
+											</span>
+										) : null}
+										<span className="rounded-full bg-secondary px-2.5 py-1">
+											{mapHike.distanceMi.toFixed(1)} mi
+										</span>
+									</div>
+									<p className="m-0 text-[13px] leading-relaxed">
+										{mapHike.description ?? 'Description coming soon.'}
+									</p>
+								</div>
+							) : null}
 						</div>
 					) : null}
 					<button
