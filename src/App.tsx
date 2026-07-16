@@ -207,19 +207,6 @@ export default function App() {
 					>
 						<span className="text-xl">◎</span>
 					</button>
-					<div className="absolute bottom-3 left-3 z-[550] rounded-xl bg-white/90 px-3 py-2 text-[11px] shadow">
-						<div className="mb-1 font-semibold">Map key</div>
-						<div className="flex items-center gap-1.5">
-							<span className="grid h-3.5 w-3.5 place-items-center rounded-full bg-amber-400 text-[8px] text-white">
-								★
-							</span>
-							Collectible
-						</div>
-						<div className="flex items-center gap-1.5">
-							<span className="h-3.5 w-3.5 rounded-full bg-slate-500" />
-							Landmark
-						</div>
-					</div>
 					{toast ? (
 						<div className="-translate-x-1/2 absolute bottom-20 left-1/2 z-[700] max-w-[90%] rounded-full bg-black/80 px-4 py-2 text-center text-sm text-white shadow-lg">
 							{toast}
