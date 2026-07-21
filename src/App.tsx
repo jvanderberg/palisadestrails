@@ -8,7 +8,7 @@ import MapView, { type FitTarget, type FocusTarget, type HikeView } from './comp
 import Menu from './components/Menu';
 import RewardModal from './components/RewardModal';
 import ShareAppModal from './components/ShareAppModal';
-import { COLLECTIBLES, currentTier, GAME_CONFIG, type Tier } from './data/collectibles';
+import { COLLECTIBLES, currentTier, GAME_CONFIG, type Tier, TOP_TIER } from './data/collectibles';
 import { formatHikeTime, HIKES, type Hike, hikeEndpoints, hikeTrails } from './data/hikes';
 import { annotate } from './game/proximity';
 import { selectCount, useGame } from './game/store';
@@ -60,6 +60,20 @@ export default function App() {
 		setToast(msg);
 		window.clearTimeout(toastTimer.current);
 		toastTimer.current = window.setTimeout(() => setToast(null), 2400);
+	}, []);
+
+	// Local development preview for reviewing the complete top-tier flow.
+	// This branch is removed from production builds by Vite.
+	useEffect(() => {
+		if (!import.meta.env.DEV) return;
+		if (new URLSearchParams(window.location.search).get('demo') !== 'trailblazer') return;
+		const timestamp = new Date().toISOString();
+		useGame.setState({
+			name: 'Trailblazer Demo',
+			collected: Object.fromEntries(COLLECTIBLES.map((poi) => [poi.id, timestamp])),
+			unlocked: true,
+		});
+		setRewardTier(TOP_TIER);
 	}, []);
 
 	// Auto-open the certificate each time a new rank is reached.

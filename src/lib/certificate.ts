@@ -147,13 +147,13 @@ export function drawCertificate(canvas: HTMLCanvasElement, data: CertData): void
 	}
 
 	g.fillStyle = '#8a8272';
-	g.font = `28px ${sans}`;
-	g.fillText(`${GAME_CONFIG.parkName} · ${fmtDate(data.date)}`, W / 2, H - 148);
+	g.font = `30px ${sans}`;
+	g.fillText(`${GAME_CONFIG.parkName} · ${fmtDate(data.date)}`, W / 2, H - 190);
 	g.fillStyle = '#c9a53a';
-	g.font = `600 26px ${sans}`;
+	g.font = `700 36px ${sans}`;
 	g.fillText(
 		isTop ? 'Screenshot & send in to claim your t-shirt' : 'Screenshot to share your rank',
 		W / 2,
-		H - 106,
+		H - 145,
 	);
 }

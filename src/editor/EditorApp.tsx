@@ -8,7 +8,7 @@ import {
 	lineMetres,
 	parseGeoFile,
 	slugify,
-	splitTrail,
+	splitTrailAtVertex,
 	uniqueId,
 } from './model';
 import type { EditorHike, EditorProject, EditorTab, Interaction } from './types';
@@ -250,7 +250,7 @@ export default function EditorApp() {
 		hike.route = { names: route.names, coords: route.coords };
 	};
 
-	const trailClick = (id: string, point: LatLng) => {
+	const trailClick = (id: string) => {
 		if (!project) return;
 		if (tab === 'hikes' && interaction?.type === 'pick-hike') {
 			const nextIds = hikeDraftIds.includes(id)
@@ -265,22 +265,7 @@ export default function EditorApp() {
 			setSelection((value) => ({ ...value, trail: id }));
 			return;
 		}
-		if (interaction?.type === 'split-trail') {
-			try {
-				let firstId = id;
-				commit((draft) => {
-					const result = splitTrail(draft.park.trails, id, point);
-					draft.park.trails = result.trails;
-					[firstId] = result.ids;
-				}, 'Split trail into two segments');
-				setSelection((value) => ({ ...value, trail: firstId }));
-				setInteraction(null);
-			} catch (error) {
-				setStatus((error as Error).message);
-				setStatusType('error');
-			}
-			return;
-		}
+		if (interaction?.type === 'split-trail') return;
 		if (interaction?.type === 'join-trail') {
 			if (id === interaction.firstId) return;
 			try {
@@ -304,6 +289,23 @@ export default function EditorApp() {
 			return;
 		}
 		setSelection((value) => ({ ...value, trail: id }));
+	};
+
+	const splitSelectedTrail = (trailId: string, vertexIndex: number) => {
+		if (interaction?.type !== 'split-trail' || interaction.trailId !== trailId) return;
+		try {
+			let firstId = trailId;
+			commit((draft) => {
+				const result = splitTrailAtVertex(draft.park.trails, trailId, vertexIndex);
+				draft.park.trails = result.trails;
+				[firstId] = result.ids;
+			}, 'Split trail into two segments');
+			setSelection((value) => ({ ...value, trail: firstId }));
+			setInteraction(null);
+		} catch (error) {
+			setStatus((error as Error).message);
+			setStatusType('error');
+		}
 	};
 
 	const mapClick = (point: LatLng) => {
@@ -556,7 +558,7 @@ export default function EditorApp() {
 		interaction?.type === 'draw-trail'
 			? 'Click the map to add trail vertices, then Finish drawing.'
 			: interaction?.type === 'split-trail'
-				? 'Click a trail where it should be split.'
+				? 'Click an interior pink vertex on the selected segment.'
 				: interaction?.type === 'join-trail'
 					? 'Click the second segment; nearest endpoints will be joined.'
 					: interaction?.type === 'add-marker'
@@ -732,7 +734,9 @@ export default function EditorApp() {
 										<button
 											type="button"
 											className="editor-button"
-											onClick={() => setInteraction({ type: 'split-trail' })}
+											onClick={() =>
+												setInteraction({ type: 'split-trail', trailId: selectedTrail.id })
+											}
 										>
 											Split
 										</button>
@@ -1151,6 +1155,7 @@ export default function EditorApp() {
 						setSelection((value) => ({ ...value, poi: id }));
 					}}
 					onBeginGesture={beginGesture}
+					onSplitTrailVertex={splitSelectedTrail}
 					onTrailVertex={moveTrailVertex}
 					onMoveMarker={moveMarker}
 					onMovePoi={movePoi}

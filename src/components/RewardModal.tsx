@@ -1,8 +1,9 @@
-import { X } from 'lucide-react';
+import { Mail, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { COLLECTIBLES, isTopTier, type Tier, TOP_TIER } from '../data/collectibles';
 import { selectCount, useGame } from '../game/store';
 import { drawCertificate } from '../lib/certificate';
+import { buildTshirtRedemptionMailto } from '../lib/redemption';
 
 interface Props {
 	/** Which rank's certificate to show; null = closed. */
@@ -17,6 +18,10 @@ export default function RewardModal({ tier, onClose }: Props) {
 	const setName = useGame((s) => s.setName);
 	const count = useGame(selectCount);
 	const isTop = tier ? isTopTier(tier) : false;
+	const collectedPointNames = COLLECTIBLES.filter((point) => collected[point.id]).map(
+		(point) => point.name,
+	);
+	const redemptionHref = buildTshirtRedemptionMailto(name, collectedPointNames);
 
 	// Repaint whenever the modal opens or the name/collection changes.
 	useEffect(() => {
@@ -96,9 +101,17 @@ export default function RewardModal({ tier, onClose }: Props) {
 					>
 						Save / Share image
 					</button>
+					{isTop ? (
+						<a
+							href={redemptionHref}
+							className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-[#c9a53a] py-3 font-bold text-[#1c4523]"
+						>
+							<Mail size={19} /> Redeem T-shirt
+						</a>
+					) : null}
 					<p className="mt-2 text-center text-xs text-muted-foreground">
 						{isTop
-							? `Screenshot or save this certificate and send it in to claim your ${TOP_TIER.title} t-shirt.`
+							? `Use Redeem T-shirt to email your ${TOP_TIER.title} record and shirt size.`
 							: 'Screenshot or save this certificate to share your rank.'}
 					</p>
 				</div>

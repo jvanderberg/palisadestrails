@@ -1,4 +1,4 @@
-import { ChevronRight, Download, Map as MapIcon, Medal, Share2, X } from 'lucide-react';
+import { ChevronRight, Download, Mail, Map as MapIcon, Medal, Share2, X } from 'lucide-react';
 import { isTopTier, TIERS, type Tier } from '../data/collectibles';
 import { formatHikeTime, HIKES } from '../data/hikes';
 
@@ -97,6 +97,16 @@ export default function Menu({
 						</span>
 						<ChevronRight size={18} className="shrink-0 text-muted-foreground" />
 					</button>
+					<a
+						href="mailto:jvanderberg@gmail.com?subject=Palisades%20Trails%20feedback"
+						onClick={onClose}
+						className="flex w-full items-center justify-between gap-2 border-border/60 border-t px-4 py-3 text-left"
+					>
+						<span className="flex items-center gap-3">
+							<Mail size={20} /> Send feedback
+						</span>
+						<ChevronRight size={18} className="shrink-0 text-muted-foreground" />
+					</a>
 
 					<div className="mt-2 px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
 						Certificates

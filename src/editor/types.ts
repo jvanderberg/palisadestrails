@@ -36,7 +36,7 @@ export type EditorTab = 'trails' | 'markers' | 'pois' | 'hikes';
 
 export type Interaction =
 	| { type: 'draw-trail'; trailId: string }
-	| { type: 'split-trail' }
+	| { type: 'split-trail'; trailId: string }
 	| { type: 'join-trail'; firstId: string }
 	| { type: 'add-marker' }
 	| { type: 'add-poi' }

@@ -93,6 +93,32 @@ export function splitTrail(
 	};
 }
 
+export function splitTrailAtVertex(
+	trails: EditorTrail[],
+	id: string,
+	vertexIndex: number,
+): { trails: EditorTrail[]; ids: [string, string] } {
+	const index = trails.findIndex((trail) => trail.id === id);
+	if (index < 0) throw new Error(`Unknown trail: ${id}`);
+	const trail = trails[index];
+	if (vertexIndex <= 0 || vertexIndex >= trail.coords.length - 1)
+		throw new Error('Choose an interior vertex, not a trail endpoint.');
+	const first = {
+		...clone(trail),
+		id: splitId(id, 'a', trails),
+		coords: trail.coords.slice(0, vertexIndex + 1),
+	};
+	const second = {
+		...clone(trail),
+		id: splitId(id, 'b', [...trails, first]),
+		coords: trail.coords.slice(vertexIndex),
+	};
+	return {
+		trails: [...trails.slice(0, index), first, second, ...trails.slice(index + 1)],
+		ids: [first.id, second.id],
+	};
+}
+
 export function joinTrails(
 	trails: EditorTrail[],
 	firstId: string,

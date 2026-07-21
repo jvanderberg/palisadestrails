@@ -51,10 +51,11 @@ interface Props {
 	interaction: Interaction;
 	hikeDraftIds: string[];
 	onMapClick: (point: LatLng) => void;
-	onTrailClick: (id: string, point: LatLng) => void;
+	onTrailClick: (id: string) => void;
 	onSelectMarker: (index: number) => void;
 	onSelectPoi: (id: string) => void;
 	onBeginGesture: () => void;
+	onSplitTrailVertex: (trailId: string, index: number) => void;
 	onTrailVertex: (trailId: string, index: number, point: LatLng) => void;
 	onMoveMarker: (index: number, point: LatLng) => void;
 	onMovePoi: (id: string, point: LatLng) => void;
@@ -75,6 +76,7 @@ export default function EditorMap({
 	onSelectMarker,
 	onSelectPoi,
 	onBeginGesture,
+	onSplitTrailVertex,
 	onTrailVertex,
 	onMoveMarker,
 	onMovePoi,
@@ -118,7 +120,7 @@ export default function EditorMap({
 						eventHandlers={{
 							click: (event) => {
 								L.DomEvent.stopPropagation(event.originalEvent);
-								onTrailClick(trail.id, [event.latlng.lat, event.latlng.lng]);
+								onTrailClick(trail.id);
 							},
 						}}
 					>
@@ -183,9 +185,17 @@ export default function EditorMap({
 							key={index}
 							position={point}
 							icon={vertexIcon}
-							draggable
+							draggable={interaction?.type !== 'split-trail'}
 							zIndexOffset={1200}
 							eventHandlers={{
+								click: (event) => {
+									L.DomEvent.stopPropagation(event.originalEvent);
+									if (
+										interaction?.type === 'split-trail' &&
+										interaction.trailId === selectedTrail.id
+									)
+										onSplitTrailVertex(selectedTrail.id, index);
+								},
 								dragstart: onBeginGesture,
 								drag: (event) => {
 									const value = event.target.getLatLng();

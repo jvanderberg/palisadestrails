@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildRoute, joinTrails, parseGeoFile, splitTrail } from './model';
+import { buildRoute, joinTrails, parseGeoFile, splitTrailAtVertex } from './model';
 import type { EditorTrail } from './types';
 
 const trails: EditorTrail[] = [
@@ -28,11 +28,19 @@ const trails: EditorTrail[] = [
 ];
 
 describe('trail editor geometry', () => {
-	it('splits a trail at the projected point without mutating the source', () => {
-		const result = splitTrail(trails, 'one', [42, -85.9995]);
+	it('splits a trail exactly at an interior vertex without mutating the source', () => {
+		const result = splitTrailAtVertex(trails, 'one', 1);
 		expect(result.trails).toHaveLength(3);
 		expect(result.ids).toEqual(['one-a', 'one-b']);
-		expect(result.trails[0].coords.at(-1)).toEqual(result.trails[1].coords[0]);
+		expect(result.trails[0].coords).toEqual([
+			[42, -86],
+			[42, -85.999],
+		]);
+		expect(result.trails[1].coords).toEqual([
+			[42, -85.999],
+			[42, -85.998],
+		]);
+		expect(() => splitTrailAtVertex(trails, 'one', 0)).toThrow('interior vertex');
 		expect(trails[0].coords).toHaveLength(3);
 	});
 
