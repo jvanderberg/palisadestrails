@@ -28,6 +28,19 @@ npm run build
 Append `?sim=lat,lon` to simulate a location during development. For example,
 `?sim=42.307439,-86.313926` places the user near Big Pine.
 
+## Local trail editor
+
+Run `npm run editor`, then open <http://127.0.0.1:4174/tools/editor/>. The editor
+is a local-only React/TypeScript app using React-Leaflet; it is excluded from the
+public PWA build.
+
+It can create, update, and delete trails, markers, POIs, and curated hikes;
+split and join trail segments; edit segment names and colors; rebuild hike
+routes by clicking trail segments; and import GPX or KML geometry. Saving writes
+the baked files in `src/data` atomically and first creates a timestamped backup
+under `.trail-editor-backups/`. Keep existing POI and hike IDs when editing so
+saved user progress remains valid.
+
 ## License
 
 The application shell and software implementation are available under the MIT

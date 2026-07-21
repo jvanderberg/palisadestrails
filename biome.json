@@ -4,6 +4,7 @@
 		"includes": [
 			"**",
 			"!dist",
+			"!.editor-dist",
 			"!node_modules",
 			"!tools",
 			"!scripts",

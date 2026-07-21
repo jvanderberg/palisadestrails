@@ -20,6 +20,8 @@ export interface SignPost {
 }
 
 export interface Trail {
+	/** Stable editor identity. Older imports may omit it until their first editor save. */
+	id?: string;
 	name: string;
 	color: string;
 	/** CalTopo folder this trail belongs to (used to group hikes), if any. */

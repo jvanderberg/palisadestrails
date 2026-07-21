@@ -1,5 +1,7 @@
-node_modules
-dist
-*.local
-.DS_Store
+dist/
+node_modules/
 node_modules/.tmp
+*.local
+.trail-editor-backups/
+.editor-dist/
+.DS_Store

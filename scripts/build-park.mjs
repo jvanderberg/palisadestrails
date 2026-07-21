@@ -127,6 +127,20 @@ const points = pts.map((f) => ({
 	lon: f.geometry.coordinates[0],
 }));
 
+// Editor identities are persisted in park.json. They are deliberately separate
+// from trail names so renaming a segment in the editor does not break selection.
+const trailIdCounts = new Map();
+for (const trail of trails) {
+	const base =
+		trail.name
+			.toLowerCase()
+			.replace(/[^a-z0-9]+/g, '-')
+			.replace(/^-|-$/g, '') || 'trail';
+	const count = (trailIdCounts.get(base) ?? 0) + 1;
+	trailIdCounts.set(base, count);
+	trail.id = `trail-${base}-${count}`;
+}
+
 let minLat = 90;
 let minLon = 180;
 let maxLat = -90;

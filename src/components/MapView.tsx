@@ -263,7 +263,7 @@ export default function MapView({
 				) : (
 					park.trails.map((t) => (
 						<Polyline
-							key={`trail-${t.name}-${t.coords[0]?.join(',')}`}
+							key={t.id ?? `trail-${t.name}-${t.coords[0]?.join(',')}`}
 							positions={t.coords}
 							pathOptions={{
 								color: t.color === '#000000' ? '#3d4a33' : t.color,
