@@ -25,6 +25,16 @@ export function landmarkIcon(): L.DivIcon {
 	});
 }
 
+export function personalMarkerIcon(): L.DivIcon {
+	return L.divIcon({
+		className: '',
+		html: '<div class="personal-marker"><span></span></div>',
+		iconSize: [28, 36],
+		iconAnchor: [14, 34],
+		popupAnchor: [0, -34],
+	});
+}
+
 export function endpointIcon(kind: 'start' | 'end' | 'startfinish'): L.DivIcon {
 	const label = kind === 'start' ? 'Start' : kind === 'end' ? 'Finish' : 'Start / Finish';
 	// The combined marker needs a wider pill to fit its label.

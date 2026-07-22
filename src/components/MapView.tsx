@@ -17,7 +17,9 @@ import { type LatLng, park } from '../data/park';
 import type { PoiInfo } from '../game/proximity';
 import type { Position, Recenter } from '../game/useGeolocation';
 import { fmtDist, metres } from '../lib/geo';
-import { endpointIcon, landmarkIcon, poiIcon } from '../lib/markers';
+import { endpointIcon, landmarkIcon, personalMarkerIcon, poiIcon } from '../lib/markers';
+import MarkerPhoto from '../personal/MarkerPhoto';
+import type { PersonalMarker } from '../personal/store';
 import BasemapSwitcher, { type BasemapOption } from './BasemapSwitcher';
 
 /** Only show the (43) permanent trail labels once zoomed in enough to read them. */
@@ -65,6 +67,8 @@ export interface FocusTarget {
 	lon: number;
 	/** Bumped on every request so repeated focuses of the same id re-fire. */
 	nonce: number;
+	/** Explicit Leaflet marker registry key; POIs use their legacy implicit key. */
+	markerKey?: string;
 }
 
 export interface FitTarget {
@@ -80,6 +84,13 @@ export interface HikeView {
 	end?: LatLng;
 }
 
+export interface PersonalTrackView {
+	id: string;
+	name: string;
+	segments: LatLng[][];
+	selected: boolean;
+}
+
 interface Props {
 	pois: PoiInfo[];
 	pos: Position | null;
@@ -89,9 +100,12 @@ interface Props {
 	recenter: Recenter | null;
 	/** When set, show only this hike's trail segments + Start/Finish. */
 	hikeView: HikeView | null;
+	personalTracks: PersonalTrackView[];
+	personalMarkers: PersonalMarker[];
 	/** True when the map view is showing — triggers a Leaflet resize. */
 	visible: boolean;
 	onCollect: (id: string) => void;
+	onEditPersonalMarker: (marker: PersonalMarker) => void;
 }
 
 /** Leaflet mis-sizes when its container was display:none; fix on reveal. */
@@ -118,7 +132,7 @@ function FocusController({
 	useEffect(() => {
 		if (!focus) return;
 		map.flyTo([focus.lat, focus.lon], Math.max(map.getZoom(), 18), { duration: 0.4 });
-		const marker = markers.get(`poi:${focus.id}`);
+		const marker = markers.get(focus.markerKey ?? `poi:${focus.id}`);
 		if (!marker) return;
 		const t = setTimeout(() => marker.openPopup(), 420);
 		return () => clearTimeout(t);
@@ -181,8 +195,11 @@ export default function MapView({
 	fit,
 	recenter,
 	hikeView,
+	personalTracks,
+	personalMarkers,
 	visible,
 	onCollect,
+	onEditPersonalMarker,
 }: Props) {
 	const markers = useRef<Map<string, L.Marker>>(new Map());
 	const bounds = useMemo(() => L.latLngBounds(park.bounds), []);
@@ -194,6 +211,10 @@ export default function MapView({
 		writeBasemap(name);
 	};
 	const active = BASEMAPS.find((b) => b.name === basemap) ?? BASEMAPS[0];
+	const selectedPersonalTrack = personalTracks.find((track) => track.selected);
+	const selectedPersonalPoints = selectedPersonalTrack?.segments.flat() ?? [];
+	const selectedPersonalStart = selectedPersonalPoints.at(0);
+	const selectedPersonalEnd = selectedPersonalPoints.at(-1);
 
 	const register = (key: string) => (m: L.Marker | null) => {
 		if (m) markers.current.set(key, m);
@@ -260,7 +281,7 @@ export default function MapView({
 							</>
 						)}
 					</>
-				) : (
+				) : selectedPersonalTrack ? null : (
 					park.trails.map((t) => (
 						<Polyline
 							key={t.id ?? `trail-${t.name}-${t.coords[0]?.join(',')}`}
@@ -281,6 +302,56 @@ export default function MapView({
 						</Polyline>
 					))
 				)}
+
+				{personalTracks.flatMap((track) =>
+					track.segments.map((coords) =>
+						coords.length > 1 ? (
+							<Polyline
+								key={`personal-track-${track.id}-${coords[0].join(',')}-${coords.at(-1)?.join(',')}`}
+								positions={coords}
+								pathOptions={{
+									color: '#7c3aed',
+									weight: 6,
+									opacity: 0.92,
+									lineCap: 'round',
+									lineJoin: 'round',
+								}}
+							>
+								<Tooltip sticky>{track.name}</Tooltip>
+							</Polyline>
+						) : null,
+					),
+				)}
+
+				{selectedPersonalTrack && selectedPersonalStart && selectedPersonalEnd ? (
+					metres(
+						selectedPersonalStart[0],
+						selectedPersonalStart[1],
+						selectedPersonalEnd[0],
+						selectedPersonalEnd[1],
+					) < 15 ? (
+						<Marker
+							position={selectedPersonalStart}
+							icon={endpointIcon('startfinish')}
+							zIndexOffset={1100}
+						>
+							<Popup>Start / Finish · {selectedPersonalTrack.name}</Popup>
+						</Marker>
+					) : (
+						<>
+							<Marker
+								position={selectedPersonalStart}
+								icon={endpointIcon('start')}
+								zIndexOffset={1100}
+							>
+								<Popup>Start · {selectedPersonalTrack.name}</Popup>
+							</Marker>
+							<Marker position={selectedPersonalEnd} icon={endpointIcon('end')} zIndexOffset={1100}>
+								<Popup>Finish · {selectedPersonalTrack.name}</Popup>
+							</Marker>
+						</>
+					)
+				) : null}
 
 				{park.points.map((p) => (
 					<Marker
@@ -327,6 +398,32 @@ export default function MapView({
 									Turn on location (◎) to collect when you're close.
 								</div>
 							)}
+						</Popup>
+					</Marker>
+				))}
+
+				{personalMarkers.map((marker) => (
+					<Marker
+						key={`personal-${marker.id}`}
+						position={[marker.lat, marker.lon]}
+						icon={personalMarkerIcon()}
+						zIndexOffset={1050}
+						ref={register(`personal:${marker.id}`)}
+					>
+						<Popup>
+							<button
+								type="button"
+								onClick={() => onEditPersonalMarker(marker)}
+								className="block w-full min-w-36 text-left"
+							>
+								<MarkerPhoto
+									markerId={marker.id}
+									hasPhoto={marker.hasPhoto}
+									version={marker.updatedAt}
+									className="mb-2 max-h-48 w-full rounded-lg object-cover"
+								/>
+								<h3 className="m-0 text-sm font-semibold">{marker.name}</h3>
+							</button>
 						</Popup>
 					</Marker>
 				))}

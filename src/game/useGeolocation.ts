@@ -34,7 +34,7 @@ function readSim(): Position | null {
 
 /**
  * A high-accuracy watch stays active to keep the phone's GPS warm. Its latest
- * fix is published every 30 seconds; the first fix and meaningful accuracy
+ * fix is published every 5 seconds; the first fix and meaningful accuracy
  * improvements publish immediately. Tapping the button requests a fresh fix
  * and recenters on it. A `?sim=` query param short-circuits to a fixed position.
  */

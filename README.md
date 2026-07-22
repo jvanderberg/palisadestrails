@@ -11,6 +11,8 @@ points of interest, and earn trail-mastery certificates.
 - Mobile-friendly topographic, street, and USGS basemaps
 - Curated hikes with difficulty, distance, directions, and mapped routes
 - Automatic location updates and proximity-based POI collection
+- Private, on-device hike recording with pause/resume, editable names, and saved tracks
+- Personal map markers with editable names and optional on-device photos
 - Offline app shell and caching for previously viewed map tiles
 - Installable PWA with locally saved progress and shareable certificates
 

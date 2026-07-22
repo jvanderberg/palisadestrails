@@ -6,6 +6,8 @@ import HikeDetail from './components/HikeDetail';
 import InstallHelpModal from './components/InstallHelpModal';
 import MapView, { type FitTarget, type FocusTarget, type HikeView } from './components/MapView';
 import Menu from './components/Menu';
+import PersonalHikesPanel from './components/PersonalHikesPanel';
+import PersonalMarkersPanel from './components/PersonalMarkersPanel';
 import RewardModal from './components/RewardModal';
 import ShareAppModal from './components/ShareAppModal';
 import { COLLECTIBLES, currentTier, GAME_CONFIG, type Tier, TOP_TIER } from './data/collectibles';
@@ -13,9 +15,10 @@ import { formatHikeTime, HIKES, type Hike, hikeEndpoints, hikeTrails } from './d
 import { annotate } from './game/proximity';
 import { selectCount, useGame } from './game/store';
 import { useGeolocation } from './game/useGeolocation';
+import { type PersonalHike, type PersonalMarker, usePersonal } from './personal/store';
 
 export default function App() {
-	// Route is 'map', 'collect', or `hike:<id>`.
+	// Route is a main menu page or `hike:<id>` for a curated hike.
 	const [route, setRoute] = useState('map');
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [installHelpOpen, setInstallHelpOpen] = useState(false);
@@ -25,6 +28,9 @@ export default function App() {
 	// When set, the map shows only this hike's trail portion + Start/Finish.
 	const [mapHikeId, setMapHikeId] = useState<string | null>(null);
 	const [mapDetailsOpen, setMapDetailsOpen] = useState(false);
+	const [personalHikeViewId, setPersonalHikeViewId] = useState<string | null>(null);
+	const [personalHikeEditId, setPersonalHikeEditId] = useState<string | null>(null);
+	const [personalMarkerEditId, setPersonalMarkerEditId] = useState<string | null>(null);
 	// Which rank's certificate is showing (null = closed).
 	const [rewardTier, setRewardTier] = useState<Tier | null>(null);
 	const [toast, setToast] = useState<string | null>(null);
@@ -36,6 +42,14 @@ export default function App() {
 	const doCollect = useGame((s) => s.collect);
 	const unlocked = useGame((s) => s.unlocked);
 	const unlock = useGame((s) => s.unlock);
+	const personalHikes = usePersonal((state) => state.hikes);
+	const personalMarkers = usePersonal((state) => state.markers);
+	const activeHikeId = usePersonal((state) => state.activeHikeId);
+	const addTrackPoint = usePersonal((state) => state.addTrackPoint);
+	const pausePersonalHike = usePersonal((state) => state.pauseHike);
+	const resumePersonalHike = usePersonal((state) => state.resumeHike);
+	const finishPersonalHike = usePersonal((state) => state.finishHike);
+	const activePersonalHike = personalHikes.find((hike) => hike.id === activeHikeId);
 
 	const pois = useMemo(
 		() => annotate(COLLECTIBLES, collected, pos, GAME_CONFIG.collectRadiusM),
@@ -55,6 +69,21 @@ export default function App() {
 		const { start, end } = hikeEndpoints(h);
 		return { name: h.name, trails: hikeTrails(h), start, end };
 	}, [mapHike]);
+	const personalTracks = useMemo(() => {
+		const ids = new Set(
+			(personalHikeViewId ? [personalHikeViewId] : [activeHikeId]).filter(Boolean),
+		);
+		return personalHikes
+			.filter((hike) => ids.has(hike.id))
+			.map((hike) => ({
+				id: hike.id,
+				name: hike.name,
+				selected: hike.id === personalHikeViewId,
+				segments: hike.segments.map((segment) =>
+					segment.map((point): [number, number] => [point.lat, point.lon]),
+				),
+			}));
+	}, [personalHikes, activeHikeId, personalHikeViewId]);
 
 	const flash = useCallback((msg: string) => {
 		setToast(msg);
@@ -89,9 +118,17 @@ export default function App() {
 		if (error) flash(error);
 	}, [error, flash]);
 
+	useEffect(() => {
+		if (!pos || activePersonalHike?.status !== 'recording') return;
+		addTrackPoint({ ...pos, timestamp: Date.now() });
+	}, [pos, activePersonalHike?.status, addTrackPoint]);
+
 	const navigate = useCallback((r: string) => {
 		// Choosing "Map" from the menu returns to the full trail network.
-		if (r === 'map') setMapHikeId(null);
+		if (r === 'map') {
+			setMapHikeId(null);
+			setPersonalHikeViewId(null);
+		}
 		setRoute(r);
 		setMenuOpen(false);
 	}, []);
@@ -119,16 +156,42 @@ export default function App() {
 	const showHikeOnMap = useCallback((hike: Hike) => {
 		const coords = hikeTrails(hike).flat();
 		setMapHikeId(hike.id);
+		setPersonalHikeViewId(null);
 		setMapDetailsOpen(false);
 		setRoute('map');
 		if (coords.length > 0) setFit((f) => ({ coords, nonce: (f?.nonce ?? 0) + 1 }));
+	}, []);
+
+	const showPersonalHikeOnMap = useCallback((hike: PersonalHike) => {
+		const coords = hike.segments.flatMap((segment) =>
+			segment.map((point): [number, number] => [point.lat, point.lon]),
+		);
+		setMapHikeId(null);
+		setPersonalHikeViewId(hike.id);
+		setRoute('map');
+		if (coords.length) setFit((value) => ({ coords, nonce: (value?.nonce ?? 0) + 1 }));
+	}, []);
+
+	const showPersonalMarkerOnMap = useCallback((marker: PersonalMarker) => {
+		setRoute('map');
+		setFocus((value) => ({
+			id: marker.id,
+			markerKey: `personal:${marker.id}`,
+			lat: marker.lat,
+			lon: marker.lon,
+			nonce: (value?.nonce ?? 0) + 1,
+		}));
 	}, []);
 
 	const title = activeHike
 		? activeHike.name
 		: route === 'collect'
 			? 'Trail Mastery'
-			: 'Palisades Trails';
+			: route === 'my-hikes'
+				? 'My Hikes'
+				: route === 'my-markers'
+					? 'My Markers'
+					: 'Palisades Trails';
 
 	return (
 		<div className="flex h-[100dvh] flex-col overflow-hidden bg-background text-foreground">
@@ -167,8 +230,14 @@ export default function App() {
 						fit={fit}
 						recenter={recenter}
 						hikeView={hikeView}
+						personalTracks={personalTracks}
+						personalMarkers={personalMarkers}
 						visible={route === 'map'}
 						onCollect={handleCollect}
+						onEditPersonalMarker={(marker) => {
+							setPersonalMarkerEditId(marker.id);
+							setRoute('my-markers');
+						}}
 					/>
 					{hikeView && mapHike ? (
 						<div className="-translate-x-1/2 absolute top-20 left-1/2 z-[600] w-[calc(100%-1.5rem)] max-w-md overflow-hidden rounded-2xl bg-primary/95 text-sm text-primary-foreground shadow-lg sm:top-3">
@@ -233,6 +302,42 @@ export default function App() {
 							{toast}
 						</div>
 					) : null}
+					{activePersonalHike ? (
+						<div className="absolute bottom-3 left-3 z-[600] flex items-center gap-1 rounded-2xl bg-white/95 p-1.5 shadow-lg">
+							<span className="max-w-32 truncate px-2 text-xs font-bold">
+								{activePersonalHike.status === 'recording' ? '● Recording' : 'Paused'}
+							</span>
+							{activePersonalHike.status === 'recording' ? (
+								<button
+									type="button"
+									onClick={() => pausePersonalHike()}
+									className="rounded-xl bg-amber-100 px-3 py-2 text-xs font-bold text-amber-900"
+								>
+									Pause
+								</button>
+							) : (
+								<button
+									type="button"
+									onClick={() => resumePersonalHike(pos)}
+									className="rounded-xl bg-primary px-3 py-2 text-xs font-bold text-white"
+								>
+									Resume
+								</button>
+							)}
+							<button
+								type="button"
+								onClick={() => {
+									const finishedId = activePersonalHike.id;
+									finishPersonalHike(pos);
+									setPersonalHikeEditId(finishedId);
+									setRoute('my-hikes');
+								}}
+								className="rounded-xl bg-red-700 px-3 py-2 text-xs font-bold text-white"
+							>
+								Finish
+							</button>
+						</div>
+					) : null}
 				</div>
 
 				<div className={`absolute inset-0 ${route === 'collect' ? 'block' : 'hidden'}`}>
@@ -241,6 +346,27 @@ export default function App() {
 						onCollect={handleCollect}
 						onFocus={focusPoi}
 						onClaim={() => setRewardTier(currentTier(count))}
+					/>
+				</div>
+
+				<div className={`absolute inset-0 ${route === 'my-hikes' ? 'block' : 'hidden'}`}>
+					<PersonalHikesPanel
+						position={pos}
+						onLocate={locate}
+						onShowMap={showPersonalHikeOnMap}
+						openEditorId={personalHikeEditId}
+						onEditorOpened={() => setPersonalHikeEditId(null)}
+					/>
+				</div>
+
+				<div className={`absolute inset-0 ${route === 'my-markers' ? 'block' : 'hidden'}`}>
+					<PersonalMarkersPanel
+						position={pos}
+						onLocate={locate}
+						onShowMap={showPersonalMarkerOnMap}
+						onMessage={flash}
+						openEditorId={personalMarkerEditId}
+						onEditorOpened={() => setPersonalMarkerEditId(null)}
 					/>
 				</div>
 
@@ -255,6 +381,9 @@ export default function App() {
 				open={menuOpen}
 				route={route}
 				collectedCount={count}
+				personalHikeCount={personalHikes.filter((hike) => hike.status === 'finished').length}
+				personalMarkerCount={personalMarkers.length}
+				recording={activePersonalHike?.status === 'recording'}
 				onClose={() => setMenuOpen(false)}
 				onNavigate={navigate}
 				onOpenCert={(t) => {

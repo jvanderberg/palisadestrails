@@ -1,4 +1,14 @@
-import { ChevronRight, Download, Mail, Map as MapIcon, Medal, Share2, X } from 'lucide-react';
+import {
+	ChevronRight,
+	Download,
+	Mail,
+	Map as MapIcon,
+	MapPin,
+	Medal,
+	Route,
+	Share2,
+	X,
+} from 'lucide-react';
 import { isTopTier, TIERS, type Tier } from '../data/collectibles';
 import { formatHikeTime, HIKES } from '../data/hikes';
 
@@ -6,6 +16,9 @@ interface Props {
 	open: boolean;
 	route: string;
 	collectedCount: number;
+	personalHikeCount: number;
+	personalMarkerCount: number;
+	recording: boolean;
 	onClose: () => void;
 	onNavigate: (route: string) => void;
 	onOpenCert: (tier: Tier) => void;
@@ -17,6 +30,9 @@ export default function Menu({
 	open,
 	route,
 	collectedCount,
+	personalHikeCount,
+	personalMarkerCount,
+	recording,
 	onClose,
 	onNavigate,
 	onOpenCert,
@@ -62,6 +78,38 @@ export default function Menu({
 						}`}
 					>
 						<MapIcon size={20} /> Map
+					</button>
+					<button
+						type="button"
+						onClick={() => onNavigate('my-hikes')}
+						className={`flex w-full items-center justify-between px-4 py-3 text-left ${
+							route === 'my-hikes' ? 'bg-accent font-semibold text-primary' : ''
+						}`}
+					>
+						<span className="flex items-center gap-3">
+							<Route size={20} /> My Hikes
+						</span>
+						<span
+							className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+								recording ? 'bg-red-100 text-red-700' : 'bg-secondary text-secondary-foreground'
+							}`}
+						>
+							{recording ? '● REC' : personalHikeCount}
+						</span>
+					</button>
+					<button
+						type="button"
+						onClick={() => onNavigate('my-markers')}
+						className={`flex w-full items-center justify-between px-4 py-3 text-left ${
+							route === 'my-markers' ? 'bg-accent font-semibold text-primary' : ''
+						}`}
+					>
+						<span className="flex items-center gap-3">
+							<MapPin size={20} /> My Markers
+						</span>
+						<span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-secondary-foreground">
+							{personalMarkerCount}
+						</span>
 					</button>
 					<button
 						type="button"
