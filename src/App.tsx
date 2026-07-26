@@ -1,6 +1,7 @@
 import { Info, Menu as MenuIcon } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import CollectPanel from './components/CollectPanel';
+import DataBackupModal from './components/DataBackupModal';
 import Gate from './components/Gate';
 import HikeDetail from './components/HikeDetail';
 import InstallHelpModal from './components/InstallHelpModal';
@@ -22,6 +23,7 @@ export default function App() {
 	const [route, setRoute] = useState('map');
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [installHelpOpen, setInstallHelpOpen] = useState(false);
+	const [backupOpen, setBackupOpen] = useState(false);
 	const [shareOpen, setShareOpen] = useState(false);
 	const [focus, setFocus] = useState<FocusTarget | null>(null);
 	const [fit, setFit] = useState<FitTarget | null>(null);
@@ -298,7 +300,10 @@ export default function App() {
 						<span className="text-xl">◎</span>
 					</button>
 					{toast ? (
-						<div className="-translate-x-1/2 absolute bottom-20 left-1/2 z-[700] max-w-[90%] rounded-full bg-black/80 px-4 py-2 text-center text-sm text-white shadow-lg">
+						<div
+							role="status"
+							className="-translate-x-1/2 fixed bottom-20 left-1/2 z-[3000] max-w-[90%] rounded-full bg-black/80 px-4 py-2 text-center text-sm text-white shadow-lg"
+						>
 							{toast}
 						</div>
 					) : null}
@@ -390,6 +395,10 @@ export default function App() {
 					setRewardTier(t);
 					setMenuOpen(false);
 				}}
+				onOpenBackup={() => {
+					setBackupOpen(true);
+					setMenuOpen(false);
+				}}
 				onOpenInstall={() => {
 					setInstallHelpOpen(true);
 					setMenuOpen(false);
@@ -398,6 +407,12 @@ export default function App() {
 					setShareOpen(true);
 					setMenuOpen(false);
 				}}
+			/>
+			<DataBackupModal
+				open={backupOpen}
+				recording={activePersonalHike?.status === 'recording'}
+				onClose={() => setBackupOpen(false)}
+				onMessage={flash}
 			/>
 			<InstallHelpModal open={installHelpOpen} onClose={() => setInstallHelpOpen(false)} />
 			<ShareAppModal open={shareOpen} onClose={() => setShareOpen(false)} />

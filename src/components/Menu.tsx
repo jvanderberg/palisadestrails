@@ -1,5 +1,6 @@
 import {
 	ChevronRight,
+	DatabaseBackup,
 	Download,
 	Mail,
 	Map as MapIcon,
@@ -22,6 +23,7 @@ interface Props {
 	onClose: () => void;
 	onNavigate: (route: string) => void;
 	onOpenCert: (tier: Tier) => void;
+	onOpenBackup: () => void;
 	onOpenInstall: () => void;
 	onOpenShare: () => void;
 }
@@ -36,6 +38,7 @@ export default function Menu({
 	onClose,
 	onNavigate,
 	onOpenCert,
+	onOpenBackup,
 	onOpenInstall,
 	onOpenShare,
 }: Props) {
@@ -132,6 +135,16 @@ export default function Menu({
 					>
 						<span className="flex items-center gap-3">
 							<Download size={20} /> Installing this app
+						</span>
+						<ChevronRight size={18} className="shrink-0 text-muted-foreground" />
+					</button>
+					<button
+						type="button"
+						onClick={onOpenBackup}
+						className="flex w-full items-center justify-between gap-2 border-border/60 border-t px-4 py-3 text-left"
+					>
+						<span className="flex items-center gap-3">
+							<DatabaseBackup size={20} /> Data &amp; backup
 						</span>
 						<ChevronRight size={18} className="shrink-0 text-muted-foreground" />
 					</button>

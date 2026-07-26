@@ -14,6 +14,7 @@ import {
 } from 'react-leaflet';
 import { GAME_CONFIG } from '../data/collectibles';
 import { type LatLng, park } from '../data/park';
+import { basemapStorage } from '../game/progressStorage';
 import type { PoiInfo } from '../game/proximity';
 import type { Position, Recenter } from '../game/useGeolocation';
 import { fmtDist, metres } from '../lib/geo';
@@ -150,7 +151,7 @@ function ZoomWatcher({ onZoom }: { onZoom: (zoom: number) => void }) {
 const BASEMAP_KEY = 'palisades-basemap';
 function readBasemap(): string {
 	try {
-		return localStorage.getItem(BASEMAP_KEY) ?? 'USGS Topo';
+		return (basemapStorage.getItem(BASEMAP_KEY) as string | null) ?? 'USGS Topo';
 	} catch {
 		return 'USGS Topo';
 	}
@@ -158,7 +159,7 @@ function readBasemap(): string {
 
 function writeBasemap(name: string) {
 	try {
-		localStorage.setItem(BASEMAP_KEY, name);
+		basemapStorage.setItem(BASEMAP_KEY, name);
 	} catch {
 		// ignore
 	}

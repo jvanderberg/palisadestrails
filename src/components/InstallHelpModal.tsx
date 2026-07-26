@@ -121,7 +121,10 @@ export default function InstallHelpModal({ open, onClose }: Props) {
 						device.
 					</p>
 				) : (
-					<p className="mt-3 text-sm text-muted-foreground">{guide.intro}</p>
+					<div className="mt-3 space-y-2 text-sm text-muted-foreground">
+						<p>{guide.intro}</p>
+						<p>Your collected points and trail-mastery progress will come with you.</p>
+					</div>
 				)}
 				<ol className="mt-4 space-y-3">
 					{guide.steps.map((step, index) => (

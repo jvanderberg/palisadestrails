@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { currentTier, TIERS } from '../data/collectibles';
+import { progressStorage } from './progressStorage';
 import { selectCount, useGame } from './store';
 
 beforeEach(() => {
-	localStorage.clear();
+	progressStorage.removeItem('palisades-trails/v1');
 	useGame.setState({ name: '', collected: {}, unlocked: false });
 });
 
@@ -41,5 +42,10 @@ describe('useGame', () => {
 	it('persists the name', () => {
 		useGame.getState().setName('Ada');
 		expect(useGame.getState().name).toBe('Ada');
+	});
+
+	it('mirrors progress to a cookie so an installed iOS app can receive it', () => {
+		useGame.getState().collect('big-pine');
+		expect(document.cookie).toContain('palisades-progress-v1=');
 	});
 });

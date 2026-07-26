@@ -1,9 +1,9 @@
-// Game state — the single source of truth for what the player has
-// collected. Persisted to localStorage via zustand's persist middleware;
-// swap the storage engine here (e.g. for a server-backed claim registry)
-// without touching any component.
+// Game state — the single source of truth for what the player has collected.
+// Persisted locally via Zustand; the storage adapter also mirrors this small
+// record to a cookie so iOS can carry it into an installed Home Screen app.
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import { progressStorage } from './progressStorage';
 
 export interface GameState {
 	/** Player's display name for the certificate. */
@@ -42,7 +42,10 @@ export const useGame = create<GameState>()(
 			// Resets game progress only — the access gate stays unlocked.
 			reset: () => set({ collected: {} }),
 		}),
-		{ name: 'palisades-trails/v1' },
+		{
+			name: 'palisades-trails/v1',
+			storage: createJSONStorage(() => progressStorage),
+		},
 	),
 );
 
