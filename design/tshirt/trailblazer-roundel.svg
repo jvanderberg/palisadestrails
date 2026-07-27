@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200"
+     role="img" aria-label="Palisades Trailblazer roundel">
+  <title>Palisades Trailblazer — Roundel</title>
+  <!-- 2 spot colors on a forest-green shirt.
+       cream #F6F3E9 · gold #D8B444 · knockout (bare shirt) #1D4524 -->
+
+  <g fill="none" stroke="#F6F3E9">
+    <circle cx="600" cy="600" r="548" stroke-width="18"/>
+    <circle cx="600" cy="600" r="514" stroke-width="6"/>
+  </g>
+  <circle cx="600" cy="600" r="392" fill="none" stroke="#D8B444" stroke-width="7"/>
+
+  <g fill="#F6F3E9" font-size="72" text-anchor="middle"
+     font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="700">
+    <text transform="rotate(-47.190 600 600)" x="600" y="172">P</text>
+    <text transform="rotate(-39.292 600 600)" x="600" y="172">A</text>
+    <text transform="rotate(-31.663 600 600)" x="600" y="172">L</text>
+    <text transform="rotate(-26.173 600 600)" x="600" y="172">I</text>
+    <text transform="rotate(-20.414 600 600)" x="600" y="172">S</text>
+    <text transform="rotate(-12.516 600 600)" x="600" y="172">A</text>
+    <text transform="rotate(-4.352 600 600)" x="600" y="172">D</text>
+    <text transform="rotate(3.547 600 600)" x="600" y="172">E</text>
+    <text transform="rotate(11.181 600 600)" x="600" y="172">S</text>
+    <text transform="rotate(22.699 600 600)" x="600" y="172">P</text>
+    <text transform="rotate(30.598 600 600)" x="600" y="172">A</text>
+    <text transform="rotate(38.761 600 600)" x="600" y="172">R</text>
+    <text transform="rotate(46.925 600 600)" x="600" y="172">K</text>
+  </g>
+
+  <g fill="#D8B444" font-size="44" text-anchor="middle"
+     font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="700">
+    <text transform="rotate(47.862 600 600)" x="600" y="1052">E</text>
+    <text transform="rotate(41.607 600 600)" x="600" y="1052">V</text>
+    <text transform="rotate(35.351 600 600)" x="600" y="1052">E</text>
+    <text transform="rotate(28.943 600 600)" x="600" y="1052">R</text>
+    <text transform="rotate(22.534 600 600)" x="600" y="1052">Y</text>
+    <text transform="rotate(12.193 600 600)" x="600" y="1052">P</text>
+    <text transform="rotate(5.628 600 600)" x="600" y="1052">O</text>
+    <text transform="rotate(0.148 600 600)" x="600" y="1052">I</text>
+    <text transform="rotate(-5.176 600 600)" x="600" y="1052">N</text>
+    <text transform="rotate(-11.429 600 600)" x="600" y="1052">T</text>
+    <text transform="rotate(-21.458 600 600)" x="600" y="1052">F</text>
+    <text transform="rotate(-27.866 600 600)" x="600" y="1052">O</text>
+    <text transform="rotate(-34.585 600 600)" x="600" y="1052">U</text>
+    <text transform="rotate(-41.147 600 600)" x="600" y="1052">N</text>
+    <text transform="rotate(-47.709 600 600)" x="600" y="1052">D</text>
+  </g>
+
+  <!-- four-point stars closing the gap between the arcs -->
+  <g fill="#D8B444">
+    <path d="M78 600 c26 -6 38 -18 44 -44 6 26 18 38 44 44 -26 6 -38 18 -44 44 -6 -26 -18 -38 -44 -44z"/>
+    <path d="M1122 600 c-26 -6 -38 -18 -44 -44 -6 26 -18 38 -44 44 26 6 38 18 44 44 6 -26 18 -38 44 -44z"/>
+  </g>
+
+  <!-- ── center emblem: layered evergreen over a winding trail ── -->
+  <g transform="translate(600 508) scale(1.24)">
+    <g fill="#F6F3E9">
+      <polygon points="0,-250 -68,-128 68,-128"/>
+      <polygon points="0,-192 -88,-64 88,-64"/>
+      <polygon points="0,-130 -108,8 108,8"/>
+    </g>
+    <rect x="-16" y="-10" width="32" height="76" rx="8" fill="#D8B444"/>
+    <path d="M-186 104 C -118 76, -70 108, -24 95 C 32 80, 72 110, 186 88"
+          fill="none" stroke="#D8B444" stroke-width="26" stroke-linecap="round"/>
+  </g>
+
+  <!-- ── banner: gold bar with notched tails, wordmark knocked out to shirt ── -->
+  <g transform="translate(600 812)">
+    <path d="M-336 -52 h672 v104 h-672z
+             M-336 -52 L-454 -52 L-408 0 L-454 52 L-336 52 Z
+             M336 -52 L454 -52 L408 0 L454 52 L336 52 Z"
+          fill="#D8B444"/>
+    <text x="0" y="22" text-anchor="middle" fill="#1D4524" font-size="72" letter-spacing="9"
+          font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="700">TRAILBLAZER</text>
+  </g>
+</svg>

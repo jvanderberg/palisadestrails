@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1300" width="1000" height="1300"
+     role="img" aria-label="Palisades Trailblazer crest">
+  <title>Palisades Trailblazer — Crest</title>
+  <!-- 2 spot colors on a forest-green shirt.
+       cream #F6F3E9 · gold #D8B444 -->
+
+  <!-- ── shield ── -->
+  <path d="M118 110 H882 V830 C882 1010, 760 1150, 500 1246 C240 1150, 118 1010, 118 830 Z"
+        fill="none" stroke="#F6F3E9" stroke-width="18" stroke-linejoin="round"/>
+  <path d="M152 148 H848 V828 C848 984, 740 1108, 500 1194 C260 1108, 152 984, 152 828 Z"
+        fill="none" stroke="#D8B444" stroke-width="6" stroke-linejoin="round"/>
+
+  <!-- ── header ── -->
+  <g text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+    <text x="500" y="268" fill="#D8B444" font-size="62" font-weight="700"
+          letter-spacing="24">PALISADES</text>
+  </g>
+  <rect x="300" y="306" width="400" height="6" fill="#D8B444"/>
+
+  <!-- ── three evergreens, center tallest ── -->
+  <g fill="#F6F3E9">
+    <g transform="translate(304 640) scale(.6)">
+      <polygon points="0,-250 -68,-128 68,-128"/>
+      <polygon points="0,-192 -88,-64 88,-64"/>
+      <polygon points="0,-130 -108,8 108,8"/>
+    </g>
+    <g transform="translate(696 640) scale(.6)">
+      <polygon points="0,-250 -68,-128 68,-128"/>
+      <polygon points="0,-192 -88,-64 88,-64"/>
+      <polygon points="0,-130 -108,8 108,8"/>
+    </g>
+    <g transform="translate(500 648)">
+      <polygon points="0,-250 -68,-128 68,-128"/>
+      <polygon points="0,-192 -88,-64 88,-64"/>
+      <polygon points="0,-130 -108,8 108,8"/>
+    </g>
+  </g>
+  <g fill="#D8B444">
+    <rect x="293" y="632" width="22" height="52" rx="6"/>
+    <rect x="685" y="632" width="22" height="52" rx="6"/>
+    <rect x="484" y="638" width="32" height="70" rx="8"/>
+  </g>
+
+  <!-- ── winding trail beneath the treeline ── -->
+  <path d="M232 772 C 320 738, 388 780, 468 762 C 556 742, 626 786, 768 756"
+        fill="none" stroke="#D8B444" stroke-width="28" stroke-linecap="round"/>
+
+  <!-- ── wordmark ── -->
+  <rect x="212" y="836" width="576" height="5" fill="#D8B444"/>
+  <g text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+    <text x="500" y="944" fill="#F6F3E9" font-size="84" font-weight="700"
+          letter-spacing="2">TRAILBLAZER</text>
+    <text x="500" y="1044" fill="#D8B444" font-size="34" font-weight="700"
+          letter-spacing="8">EVERY POINT FOUND</text>
+  </g>
+</svg>

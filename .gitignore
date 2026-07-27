@@ -5,3 +5,5 @@ node_modules/.tmp
 .trail-editor-backups/
 .editor-dist/
 .DS_Store
+__pycache__/
+*.pyc
