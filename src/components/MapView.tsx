@@ -13,12 +13,19 @@ import {
 	useMapEvents,
 } from 'react-leaflet';
 import { GAME_CONFIG } from '../data/collectibles';
+import { FERN_LOOP_WAYPOINTS } from '../data/fernLoopWaypoints';
 import { type LatLng, park } from '../data/park';
 import { basemapStorage } from '../game/progressStorage';
 import type { PoiInfo } from '../game/proximity';
 import type { Position, Recenter } from '../game/useGeolocation';
 import { fmtDist, metres } from '../lib/geo';
-import { endpointIcon, landmarkIcon, personalMarkerIcon, poiIcon } from '../lib/markers';
+import {
+	endpointIcon,
+	fernWaypointIcon,
+	landmarkIcon,
+	personalMarkerIcon,
+	poiIcon,
+} from '../lib/markers';
 import MarkerPhoto from '../personal/MarkerPhoto';
 import type { PersonalMarker } from '../personal/store';
 import BasemapSwitcher, { type BasemapOption } from './BasemapSwitcher';
@@ -361,6 +368,33 @@ export default function MapView({
 						icon={landmarkIcon()}
 					>
 						<Popup>{p.name}</Popup>
+					</Marker>
+				))}
+
+				{/* Fern Loop interpretive stations — read-only nature-guide stops
+				    reached via the QR signs' ?p= deep links. Not collectable and
+				    not part of Trail Mastery, so no collect UI is rendered. */}
+				{FERN_LOOP_WAYPOINTS.map((wp) => (
+					<Marker
+						key={`fern-${wp.placeId}`}
+						position={[wp.lat, wp.lon]}
+						icon={fernWaypointIcon(wp.number)}
+						zIndexOffset={900}
+						ref={register(`fern:${wp.placeId}`)}
+					>
+						<Popup maxWidth={300} maxHeight={340}>
+							<h3 className="m-0 mb-0.5 text-sm font-semibold">
+								{wp.number}. {wp.title}
+							</h3>
+							<p className="mt-0 mb-1.5 text-[11px] text-muted-foreground">
+								Fern Loop &amp; Brandywine Nature Trail
+							</p>
+							{wp.paragraphs.map((text) => (
+								<p key={text.slice(0, 40)} className="mt-0 mb-1.5 text-xs leading-relaxed">
+									{text}
+								</p>
+							))}
+						</Popup>
 					</Marker>
 				))}
 

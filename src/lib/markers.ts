@@ -16,6 +16,17 @@ export function poiIcon(poi: Collectible, state: PoiState): L.DivIcon {
 	});
 }
 
+/** Numbered Fern Loop interpretive station — informational, never collectable. */
+export function fernWaypointIcon(number: number): L.DivIcon {
+	return L.divIcon({
+		className: '',
+		html: `<div class="fern-waypoint">${number}</div>`,
+		iconSize: [24, 24],
+		iconAnchor: [12, 12],
+		popupAnchor: [0, -13],
+	});
+}
+
 export function landmarkIcon(): L.DivIcon {
 	return L.divIcon({
 		className: '',
