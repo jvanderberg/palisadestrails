@@ -19,17 +19,10 @@ self.addEventListener('activate', (event) => {
 					keys.filter((k) => k !== APP_CACHE && k !== TILE_CACHE).map((k) => caches.delete(k)),
 				),
 			)
-			.then(() => self.clients.claim())
-			// An installed iOS PWA may resume its old document without navigating.
-			// Refresh controlled windows as soon as this newly stamped worker takes over.
-			.then(() => self.clients.matchAll({ type: 'window' }))
-			.then((clients) =>
-				Promise.all(
-					clients.map((client) =>
-						typeof client.navigate === 'function' ? client.navigate(client.url) : undefined,
-					),
-				),
-			),
+			// Refreshing open windows is the page's job (see main.tsx): it reloads
+			// on controllerchange only once the app is hidden, so taking over here
+			// never yanks the page out from under someone mid-interaction.
+			.then(() => self.clients.claim()),
 	);
 });
 
