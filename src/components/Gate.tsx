@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const ANSWER = 'chad';
 
@@ -14,6 +14,15 @@ interface Props {
 export default function Gate({ onPass }: Props) {
 	const [value, setValue] = useState('');
 	const [wrong, setWrong] = useState(false);
+	const inputRef = useRef<HTMLInputElement>(null);
+
+	// autoFocus alone is unreliable here: StrictMode remounts drop it in dev,
+	// and late map/geolocation initialization can steal focus right after
+	// launch. Re-assert focus a frame after mount.
+	useEffect(() => {
+		const raf = requestAnimationFrame(() => inputRef.current?.focus());
+		return () => cancelAnimationFrame(raf);
+	}, []);
 
 	function submit(e: React.FormEvent) {
 		e.preventDefault();
@@ -34,6 +43,7 @@ export default function Gate({ onPass }: Props) {
 				</label>
 				<input
 					id="gate-answer"
+					ref={inputRef}
 					type="text"
 					value={value}
 					autoComplete="off"

@@ -9,6 +9,8 @@
 			"!node_modules",
 			"!tools",
 			"!scripts",
+			"!design",
+			"!docs",
 			"!src/index.css",
 			"!src/data/*.json"
 		]

@@ -16,6 +16,7 @@ import { formatHikeTime, HIKES, type Hike, hikeEndpoints, hikeTrails } from './d
 import { annotate } from './game/proximity';
 import { selectCount, useGame } from './game/store';
 import { useGeolocation } from './game/useGeolocation';
+import { placeFromSearch } from './lib/places';
 import { type PersonalHike, type PersonalMarker, usePersonal } from './personal/store';
 
 export default function App() {
@@ -105,6 +106,26 @@ export default function App() {
 			unlocked: true,
 		});
 		setRewardTier(TOP_TIER);
+	}, []);
+
+	// QR-sign deep links: resolve `?p=p####` (printed on the physical trail
+	// signs) to its place, fly the map there, and open its popup. The param
+	// is then stripped so refreshes and PWA relaunches start clean.
+	useEffect(() => {
+		const place = placeFromSearch(window.location.search);
+		if (!place) return;
+		const target = place.kind === 'poi' ? place.poi : place.waypoint;
+		setRoute('map');
+		setFocus((f) => ({
+			id: place.placeId,
+			markerKey: place.kind === 'poi' ? `poi:${place.poi.id}` : `fern:${place.placeId}`,
+			lat: target.lat,
+			lon: target.lon,
+			nonce: (f?.nonce ?? 0) + 1,
+		}));
+		const url = new URL(window.location.href);
+		url.searchParams.delete('p');
+		window.history.replaceState(null, '', url);
 	}, []);
 
 	// Auto-open the certificate each time a new rank is reached.
