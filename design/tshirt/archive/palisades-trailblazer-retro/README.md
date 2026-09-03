@@ -4,8 +4,16 @@ A 70s/80s sunset-badge take on the Trailblazer shirt: banded sunset disc, dune
 with dune grass off the right slope, trail winding up to the crest, hiker
 silhouetted on the ridge. Only text on the shirt is "Palisades Trailblazer".
 
-Separate from `../palisades-shirt`, which reconstructs the existing
-cream-on-green printed tee. Nothing here touches that document.
+`scene.json` is the source of truth for the archived edited composition,
+including layer visibility, transforms, duplicated grass, and editable text.
+The checked-in `preview.svg` predates some scene edits and is retained only as
+project provenance; do not use it as the final design export.
+
+Separate from [`../palisades-shirt-original`](../palisades-shirt-original),
+which reconstructs the existing cream-on-green printed tee.
+
+This directory is the complete archival source project. The flattened,
+font-independent vector masters are in [`../../exports`](../../exports).
 
 ## Edit in Gimpish
 
@@ -32,10 +40,10 @@ eight independent copies. Both wordmarks are editable native text layers.
 
 ## Regenerating
 
-`build.py` is the source of truth for the artwork; the hiker contours come from
-the generated traces in `assets/`, and `scene.json` only positions the layers.
-Re-running rewrites the six full-canvas layer SVGs in place, and the editor
-hot-reloads.
+`build.py` regenerates the base layer assets; the hiker contours come from the
+generated traces in `assets/`. Re-running it rewrites the six full-canvas layer
+SVGs in place and the editor hot-reloads. It does not reproduce edits stored in
+`scene.json`.
 
 ```bash
 python3 build.py

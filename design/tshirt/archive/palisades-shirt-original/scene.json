@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "canvas": {
+    "width": 2000,
+    "height": 1500,
+    "background": "transparent"
+  },
+  "layers": [
+    {
+      "id": "original-shirt",
+      "name": "original-shirt",
+      "opacity": 1,
+      "blend": "normal",
+      "visible": false,
+      "adjustEnabled": true,
+      "type": "image",
+      "source": "shirt.jpeg",
+      "transform": {
+        "x": 0,
+        "y": 0,
+        "scale": 1,
+        "rotation": 0
+      },
+      "mask": null
+    },
+    {
+      "id": "traced-tree",
+      "name": "traced-tree",
+      "opacity": 1,
+      "blend": "normal",
+      "visible": true,
+      "adjustEnabled": true,
+      "type": "image",
+      "source": "tree-layer.svg",
+      "transform": {
+        "x": 488.9524311456338,
+        "y": 384.6860862087106,
+        "scale": 0.33577885021025616,
+        "rotation": 0
+      },
+      "mask": null
+    },
+    {
+      "id": "hug-a-tree",
+      "name": "hug-a-tree",
+      "opacity": 1,
+      "blend": "normal",
+      "visible": true,
+      "adjustEnabled": true,
+      "type": "image",
+      "source": "hug-a-tree-layer.svg",
+      "transform": {
+        "x": 545.607274159664,
+        "y": 421.99054621848745,
+        "scale": 0.3,
+        "rotation": 0
+      },
+      "mask": null
+    },
+    {
+      "id": "palisades-park-arched",
+      "name": "palisades-park-arched",
+      "opacity": 1,
+      "blend": "normal",
+      "visible": true,
+      "adjustEnabled": true,
+      "type": "image",
+      "source": "palisades-park-arched-layer.svg",
+      "transform": {
+        "x": 1.0011817226891253,
+        "y": -34.84440651260496,
+        "scale": 1,
+        "rotation": 0
+      },
+      "mask": null
+    },
+    {
+      "id": "trailblazers-bottom",
+      "name": "trailblazers-bottom",
+      "opacity": 1,
+      "blend": "normal",
+      "visible": true,
+      "adjustEnabled": true,
+      "type": "image",
+      "source": "trailblazers-bottom-layer.svg",
+      "transform": {
+        "x": 92.42881409272854,
+        "y": 137.1270530590424,
+        "scale": 0.9088677983022294,
+        "rotation": 0
+      },
+      "mask": null
+    },
+    {
+      "id": "msr-initials",
+      "name": "MSR initials",
+      "opacity": 1,
+      "blend": "normal",
+      "visible": true,
+      "adjustEnabled": true,
+      "type": "text",
+      "text": {
+        "content": "MSR",
+        "x": 883.9817489495802,
+        "y": 1020.2281381302523,
+        "font": "AmericanTypewriter-Semibold",
+        "size": 27.954170743198656,
+        "weight": "400",
+        "style": "normal",
+        "align": "left",
+        "fill": "#F2E8D5ff",
+        "stroke": null,
+        "stroke_width": 0,
+        "line_height": 1.15,
+        "letter_spacing": 0.75,
+        "rotation": -1.0230309424280253
+      }
+    }
+  ]
+}

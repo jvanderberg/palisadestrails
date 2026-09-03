@@ -1,5 +1,27 @@
 # Trailblazer T-shirt Artwork
 
+## Archived full designs
+
+The two complete, editable shirt projects are preserved locally with all source
+assets and reconstruction provenance:
+
+| Design | Editable archive | Vector master |
+| --- | --- | --- |
+| Original cream-on-green “Hug a Tree” shirt | [`archive/palisades-shirt-original/`](archive/palisades-shirt-original/) | [`exports/palisades-shirt-original.svg`](exports/palisades-shirt-original.svg) |
+| Retro sunset Trailblazer shirt | [`archive/palisades-trailblazer-retro/`](archive/palisades-trailblazer-retro/) | [`exports/palisades-trailblazer-retro.svg`](exports/palisades-trailblazer-retro.svg) |
+
+The export SVGs are extracted from the archived edited `scene.json` documents,
+with outlined paths and no linked images or live fonts. The original shirt
+master has a transparent background. The retro master includes the oatmeal
+presentation background; use
+[`exports/palisades-trailblazer-retro-transparent.svg`](exports/palisades-trailblazer-retro-transparent.svg)
+when the garment supplies that color.
+
+Open either archive's `scene.json` in Gimpish to continue editing the layered
+version.
+
+## App-derived concepts
+
 Front-chest art for the shirt earned by reaching the top rank
 (`TOP_TIER` in `src/data/collectibles.ts`). Three concepts, same palette,
 pulled from the app icon and the rank certificate.
@@ -12,7 +34,7 @@ pulled from the app icon and the rank certificate.
 | `trailblazer-crest.svg` | Shield crest — three evergreens over the trail, stacked wordmark |
 | `trailblazer-topo.svg` | Topographic map panel with a dashed route, wordmark below |
 
-## Colors
+### Colors
 
 Two inks on a forest-green shirt. No gradients, no halftones, no opacity —
 everything is a solid spot color so this screen-prints as-is.
@@ -27,13 +49,13 @@ everything is a solid spot color so this screen-prints as-is.
 through (the roundel's banner wordmark, the topo route casing). If these are
 printed on any other shirt color, those areas need to change to that color.
 
-## Sizing
+### Sizing
 
 The SVGs are unitless and scale losslessly. For a standard adult front print,
 scale the art to **11 in** wide and place the top edge 3 in below the collar
 seam. Youth sizes: 8 in wide.
 
-## Before sending to a printer
+### Before sending to a printer
 
 Text is still live text set in Helvetica Bold. Two things to do:
 
@@ -47,7 +69,7 @@ renderers and print RIPs, and it silently dropped in testing. Each glyph is an
 individually rotated `<text>` positioned from real Helvetica Bold advance
 widths.
 
-## Regenerating
+### Regenerating
 
 `trailblazer-crest.svg` is hand-authored; edit it directly. The other two are
 generated, so edit the script and re-run:
