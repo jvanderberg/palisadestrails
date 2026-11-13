@@ -9,6 +9,7 @@ import {
 	Play,
 	RotateCcw,
 	Satellite,
+	SlidersHorizontal,
 	Trees,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -65,6 +66,8 @@ export default function App() {
 	const [exaggeration, setExaggeration] = useState(initialRelief);
 	const [ground, setGround] = useState<GroundStyle>('photo');
 	const [sceneReady, setSceneReady] = useState(false);
+	// Phones: the view options fold away behind a button (always shown on desktop).
+	const [optionsOpen, setOptionsOpen] = useState(false);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -191,6 +194,18 @@ export default function App() {
 		<div className="fly-credit">Elevation: USGS 3DEP lidar · Imagery: USDA NAIP 2022</div>
 	);
 
+	const optionsButton = (
+		<button
+			type="button"
+			className={`fly-icon-btn fly-options-btn${optionsOpen ? ' active' : ''}`}
+			onClick={() => setOptionsOpen((o) => !o)}
+			aria-label="View options"
+			aria-expanded={optionsOpen}
+		>
+			<SlidersHorizontal size={16} />
+		</button>
+	);
+
 	if (RECORDING) {
 		return (
 			<div className="fly-app">
@@ -244,7 +259,7 @@ export default function App() {
 			</div>
 
 			{route ? (
-				<div className="fly-panel fly-bottom">
+				<div className={`fly-panel fly-bottom${optionsOpen ? ' open' : ''}`}>
 					<ElevationProfile
 						route={route}
 						lakeLevel={lake}
@@ -274,40 +289,46 @@ export default function App() {
 							</strong>
 							<span>{elevFt} ft elevation</span>
 						</div>
-						<fieldset className="fly-group" aria-label="Camera">
-							{MODES.map(({ id, label, icon: Icon, key }) => (
-								<button
-									key={id}
-									type="button"
-									className={mode === id ? 'active' : ''}
-									onClick={() => setMode(id)}
-									title={`${label} (${key})`}
-								>
-									<Icon size={15} />
-									<span>{label}</span>
-								</button>
-							))}
-						</fieldset>
-						<fieldset className="fly-group" aria-label="Speed">
-							{SPEEDS.map(({ mps, label }) => (
-								<button
-									key={mps}
-									type="button"
-									className={speed === mps ? 'active' : ''}
-									onClick={() => setSpeed(mps)}
-								>
-									{label}
-								</button>
-							))}
-						</fieldset>
-						<GroundToggle value={ground} onChange={setGround} />
-						<ExaggerationToggle value={exaggeration} onChange={setExaggeration} />
+						{optionsButton}
+						<div className="fly-extra">
+							<fieldset className="fly-group" aria-label="Camera">
+								{MODES.map(({ id, label, icon: Icon, key }) => (
+									<button
+										key={id}
+										type="button"
+										className={mode === id ? 'active' : ''}
+										onClick={() => setMode(id)}
+										title={`${label} (${key})`}
+									>
+										<Icon size={15} />
+										<span>{label}</span>
+									</button>
+								))}
+							</fieldset>
+							<fieldset className="fly-group" aria-label="Speed">
+								{SPEEDS.map(({ mps, label }) => (
+									<button
+										key={mps}
+										type="button"
+										className={speed === mps ? 'active' : ''}
+										onClick={() => setSpeed(mps)}
+									>
+										{label}
+									</button>
+								))}
+							</fieldset>
+							<GroundToggle value={ground} onChange={setGround} />
+							<ExaggerationToggle value={exaggeration} onChange={setExaggeration} />
+						</div>
 					</div>
 				</div>
 			) : (
-				<div className="fly-panel fly-bottom fly-bottom-slim">
-					<GroundToggle value={ground} onChange={setGround} />
-					<ExaggerationToggle value={exaggeration} onChange={setExaggeration} />
+				<div className={`fly-panel fly-bottom fly-bottom-slim${optionsOpen ? ' open' : ''}`}>
+					{optionsButton}
+					<div className="fly-extra">
+						<GroundToggle value={ground} onChange={setGround} />
+						<ExaggerationToggle value={exaggeration} onChange={setExaggeration} />
+					</div>
 				</div>
 			)}
 

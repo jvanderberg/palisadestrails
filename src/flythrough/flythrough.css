@@ -353,16 +353,98 @@ body,
 	pointer-events: none;
 }
 
+/* The view options sit inline on desktop; phones fold them behind a button. */
+.fly-extra {
+	display: contents;
+}
+
+.fly-options-btn {
+	display: none;
+	border: none;
+	color: var(--fly-text);
+	cursor: pointer;
+}
+
+.fly-options-btn.active {
+	background: rgba(255, 255, 255, 0.92);
+	color: #14201a;
+}
+
+.fly-group button {
+	white-space: nowrap;
+}
+
+/* Phones: keep the panels to a slim strip at the top and bottom so the
+   fly-through gets the screen. */
 @media (max-width: 640px) {
 	.fly-top {
-		padding: 11px;
+		top: max(8px, env(safe-area-inset-top));
+		left: 8px;
+		width: calc(100% - 16px);
+		padding: 8px;
+		gap: 6px;
+		border-radius: 14px;
+	}
+	.fly-brand,
+	.fly-hint {
+		display: none;
+	}
+	.fly-select select {
+		font-size: 15px;
+		padding: 7px 32px 7px 10px;
+	}
+	.fly-chips {
+		flex-wrap: nowrap;
+		overflow: hidden;
+		gap: 4px;
+	}
+	.fly-chip {
+		flex-shrink: 0;
+		font-size: 11px;
+		padding: 2px 8px;
+	}
+	.fly-bottom {
+		bottom: max(8px, env(safe-area-inset-bottom));
+		width: calc(100% - 16px);
+		padding: 8px 10px;
+		gap: 6px;
+		border-radius: 14px;
+	}
+	.fly-bottom-slim {
+		width: auto;
+		padding: 6px;
+	}
+	.fly-profile {
+		height: 40px;
+		gap: 6px;
+	}
+	.fly-profile-axis {
+		font-size: 10px;
+	}
+	.fly-controls {
 		gap: 8px;
 	}
-	.fly-group button span {
-		display: none;
+	.fly-controls .fly-play {
+		width: 40px;
+		height: 40px;
 	}
 	.fly-readout {
 		min-width: 0;
+	}
+	.fly-options-btn {
+		display: grid;
+	}
+	.fly-extra {
+		display: none;
+	}
+	.fly-bottom.open .fly-extra {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		width: 100%;
+	}
+	.fly-group button span {
+		display: none;
 	}
 	.fly-credit {
 		display: none;
