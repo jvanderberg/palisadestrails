@@ -1,0 +1,57 @@
+{
+	"generated": "2026-11-13",
+	"sources": {
+		"elevation": "USGS 3DEP 1 m lidar DEM (MI 13 County 2015)",
+		"imagery": "USDA NAIP 2022 via USGS The National Map"
+	},
+	"center": [
+		42.31021078687004,
+		-86.314851
+	],
+	"origin": [
+		-9608525.261217281,
+		5207561.378519336
+	],
+	"k": 0.7395111444289272,
+	"base": 173,
+	"heightScale": 0.01,
+	"lakeLevel": 176.63,
+	"inner": {
+		"cols": 1079,
+		"rows": 1050,
+		"res": 2,
+		"bbox": [
+			-9609984.333211163,
+			5206141.521620748,
+			-9607066.1892234,
+			5208981.235417924
+		],
+		"min": 174.5276336669922,
+		"max": 241.91644287109375,
+		"heights": "inner-heights.bin",
+		"image": "inner.jpg",
+		"imageSize": [
+			2877,
+			2800
+		]
+	},
+	"outer": {
+		"cols": 800,
+		"rows": 800,
+		"res": 20,
+		"bbox": [
+			-9619343.218539855,
+			5196743.421196762,
+			-9597707.303894708,
+			5218379.33584191
+		],
+		"min": 175.86399841308594,
+		"max": 249.49049377441406,
+		"heights": "outer-heights.bin",
+		"image": "outer.jpg",
+		"imageSize": [
+			3200,
+			3200
+		]
+	}
+}

@@ -1,0 +1,454 @@
+@import "@fontsource-variable/geist";
+
+:root {
+	--fly-panel: rgba(18, 26, 22, 0.78);
+	--fly-panel-border: rgba(255, 255, 255, 0.1);
+	--fly-text: #f3f5f1;
+	--fly-muted: rgba(243, 245, 241, 0.66);
+	--fly-accent: #ff7a1a;
+	--fly-chip: rgba(255, 255, 255, 0.1);
+	--fly-btn: rgba(255, 255, 255, 0.07);
+	--fly-btn-hover: rgba(255, 255, 255, 0.14);
+	color-scheme: dark;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body,
+#fly-root {
+	margin: 0;
+	height: 100%;
+	overflow: hidden;
+	background: #d9e4ec;
+	font-family: "Geist Variable", system-ui, sans-serif;
+	color: var(--fly-text);
+	-webkit-font-smoothing: antialiased;
+}
+
+.fly-app {
+	position: relative;
+	height: 100dvh;
+	width: 100%;
+}
+
+.fly-stage {
+	position: absolute;
+	inset: 0;
+}
+
+.fly-canvas {
+	display: block;
+	width: 100%;
+	height: 100%;
+	touch-action: none;
+}
+
+.fly-loading {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-content: center;
+	justify-items: center;
+	gap: 12px;
+	background: #1b2a22;
+	font-size: 15px;
+	color: var(--fly-muted);
+	z-index: 5;
+}
+
+.fly-panel {
+	position: absolute;
+	z-index: 2;
+	background: var(--fly-panel);
+	border: 1px solid var(--fly-panel-border);
+	border-radius: 16px;
+	backdrop-filter: blur(14px) saturate(1.3);
+	-webkit-backdrop-filter: blur(14px) saturate(1.3);
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+.fly-top {
+	top: max(16px, env(safe-area-inset-top));
+	left: 16px;
+	width: min(360px, calc(100% - 32px));
+	padding: 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.fly-brand {
+	display: flex;
+	flex-direction: column;
+	line-height: 1.15;
+}
+
+.fly-brand-title {
+	font-weight: 700;
+	font-size: 17px;
+}
+
+.fly-brand-sub {
+	font-size: 12px;
+	color: var(--fly-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+}
+
+.fly-select {
+	position: relative;
+	display: block;
+}
+
+.fly-select select {
+	appearance: none;
+	width: 100%;
+	font: inherit;
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--fly-text);
+	background: var(--fly-btn);
+	border: 1px solid var(--fly-panel-border);
+	border-radius: 10px;
+	padding: 9px 34px 9px 12px;
+	cursor: pointer;
+}
+
+.fly-select select:focus-visible {
+	outline: 2px solid var(--fly-accent);
+	outline-offset: 1px;
+}
+
+.fly-select option {
+	color: #111;
+}
+
+.fly-select svg {
+	position: absolute;
+	right: 11px;
+	top: 50%;
+	transform: translateY(-50%);
+	pointer-events: none;
+	color: var(--fly-muted);
+}
+
+.fly-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.fly-chip {
+	background: var(--fly-chip);
+	border-radius: 999px;
+	padding: 3px 10px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.fly-hint {
+	margin: 0;
+	font-size: 13px;
+	color: var(--fly-muted);
+}
+
+.fly-bottom {
+	left: 50%;
+	transform: translateX(-50%);
+	bottom: max(16px, env(safe-area-inset-bottom));
+	width: min(980px, calc(100% - 32px));
+	padding: 12px 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.fly-bottom-slim {
+	width: auto;
+	max-width: calc(100% - 32px);
+	padding: 8px 10px;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 8px;
+}
+
+.fly-controls {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px 12px;
+}
+
+.fly-controls button,
+.fly-group button {
+	font: inherit;
+	color: var(--fly-text);
+	border: none;
+	cursor: pointer;
+}
+
+.fly-controls .fly-play {
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	display: grid;
+	place-items: center;
+	background: var(--fly-accent);
+	color: #1a1006;
+	flex-shrink: 0;
+}
+
+.fly-icon-btn {
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	display: grid;
+	place-items: center;
+	background: var(--fly-btn);
+}
+
+.fly-icon-btn:hover {
+	background: var(--fly-btn-hover);
+}
+
+.fly-readout {
+	display: flex;
+	flex-direction: column;
+	line-height: 1.2;
+	min-width: 132px;
+	margin-right: auto;
+	font-variant-numeric: tabular-nums;
+}
+
+.fly-readout strong {
+	font-size: 15px;
+}
+
+.fly-readout span {
+	font-size: 12px;
+	color: var(--fly-muted);
+}
+
+.fly-group {
+	border: 0;
+	margin: 0;
+	min-width: 0;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	background: var(--fly-btn);
+	border-radius: 10px;
+	padding: 3px;
+}
+
+.fly-group button {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	background: transparent;
+	border-radius: 7px;
+	padding: 6px 9px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--fly-muted);
+}
+
+.fly-group button:hover {
+	color: var(--fly-text);
+	background: var(--fly-btn-hover);
+}
+
+.fly-group button.active {
+	background: rgba(255, 255, 255, 0.92);
+	color: #14201a;
+}
+
+.fly-group-label {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 0 6px 0 7px;
+	font-size: 12px;
+	color: var(--fly-muted);
+}
+
+.fly-profile {
+	display: flex;
+	gap: 8px;
+	height: 64px;
+}
+
+.fly-profile-axis {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	font-size: 11px;
+	color: var(--fly-muted);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.fly-profile-track {
+	position: relative;
+	flex: 1;
+	min-width: 0;
+	border-radius: 8px;
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.fly-profile-track svg {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+/* A real range input sits invisibly over the chart: native drag, tap-to-seek
+   and keyboard support. */
+.fly-profile-track input {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	opacity: 0;
+	cursor: ew-resize;
+	touch-action: none;
+}
+
+.fly-profile-track:has(input:focus-visible) {
+	outline: 2px solid var(--fly-accent);
+}
+
+.fly-profile-area {
+	fill: rgba(255, 244, 214, 0.18);
+}
+
+.fly-profile-area-done {
+	fill: rgba(255, 122, 26, 0.5);
+}
+
+.fly-profile-line {
+	fill: none;
+	stroke: rgba(255, 244, 214, 0.85);
+	stroke-width: 1.5;
+}
+
+.fly-profile-cursor {
+	stroke: var(--fly-accent);
+	stroke-width: 2;
+}
+
+.fly-credit {
+	position: absolute;
+	right: 10px;
+	bottom: 4px;
+	z-index: 1;
+	font-size: 10px;
+	color: rgba(20, 30, 25, 0.7);
+	text-shadow: 0 0 4px rgba(255, 255, 255, 0.6);
+	pointer-events: none;
+}
+
+@media (max-width: 640px) {
+	.fly-top {
+		padding: 11px;
+		gap: 8px;
+	}
+	.fly-group button span {
+		display: none;
+	}
+	.fly-readout {
+		min-width: 0;
+	}
+	.fly-credit {
+		display: none;
+	}
+}
+
+.fly-gate {
+	position: fixed;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	padding: 24px 16px;
+	background:
+		radial-gradient(ellipse at 30% 20%, rgba(255, 122, 26, 0.18), transparent 55%),
+		linear-gradient(160deg, #1f3328, #121b16);
+}
+
+.fly-gate-card {
+	width: min(360px, 100%);
+	text-align: center;
+}
+
+.fly-gate-icon {
+	font-size: 46px;
+}
+
+.fly-gate h1 {
+	margin: 10px 0 0;
+	font-size: 24px;
+	font-weight: 700;
+}
+
+.fly-gate-card > p {
+	margin: 8px 0 0;
+	font-size: 14px;
+	color: var(--fly-muted);
+}
+
+.fly-gate form {
+	margin-top: 24px;
+	text-align: left;
+}
+
+.fly-gate label {
+	display: block;
+	margin-bottom: 6px;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.fly-gate input {
+	width: 100%;
+	font: inherit;
+	font-size: 16px;
+	color: var(--fly-text);
+	background: rgba(255, 255, 255, 0.08);
+	border: 2px solid rgba(255, 255, 255, 0.25);
+	border-radius: 12px;
+	padding: 12px 14px;
+	outline: none;
+}
+
+.fly-gate input::placeholder {
+	color: rgba(255, 255, 255, 0.45);
+}
+
+.fly-gate input:focus {
+	border-color: rgba(255, 255, 255, 0.85);
+}
+
+.fly-gate-wrong {
+	margin: 8px 0 0;
+	font-size: 13px;
+	color: #ffd08a;
+}
+
+.fly-gate button {
+	width: 100%;
+	margin-top: 16px;
+	font: inherit;
+	font-size: 15px;
+	font-weight: 700;
+	color: #1a1006;
+	background: var(--fly-accent);
+	border: none;
+	border-radius: 12px;
+	padding: 12px;
+	cursor: pointer;
+}
