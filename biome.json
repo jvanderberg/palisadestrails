@@ -5,7 +5,6 @@
 			"**",
 			"!dist",
 			"!.editor-dist",
-			"!.flythrough-dist",
 			"!.trail-editor-backups",
 			"!node_modules",
 			"!tools",

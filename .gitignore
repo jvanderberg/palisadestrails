@@ -4,7 +4,7 @@ node_modules/.tmp
 *.local
 .trail-editor-backups/
 .editor-dist/
-.flythrough-dist/
 .DS_Store
 __pycache__/
 *.pyc
+output/video/

@@ -258,6 +258,15 @@ export default function EditorApp() {
 				: [...hikeDraftIds, id];
 			setHikeDraftIds(nextIds);
 			commit((draft) => applyHikeDraft(draft, nextIds), 'Updated hike route');
+			// Segments are joined end to end, so a skipped connector becomes a
+			// straight line across the woods — say so while it's easy to fix.
+			const gap = Math.max(0, ...buildRoute(project.park.trails, nextIds).gaps);
+			if (gap > 30) {
+				setStatus(
+					`Updated hike route — it jumps ${Math.round(gap)} m between picked segments; is a connecting trail missing?`,
+				);
+				setStatusType('error');
+			}
 			return;
 		}
 		if (tab !== 'trails') {

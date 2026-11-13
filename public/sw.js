@@ -50,6 +50,9 @@ self.addEventListener('fetch', (event) => {
 	}
 
 	if (url.origin !== self.location.origin) return;
+	// The 3D tour (/3dtour/) is a separate app with its own large terrain
+	// files; leave it to the browser rather than caching it with the PWA.
+	if (url.pathname.includes('/3dtour/')) return;
 
 	// Navigations (the HTML page): network-first, so a fresh build always
 	// loads and we never serve an index that points at deleted JS chunks.

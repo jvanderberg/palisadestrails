@@ -5,6 +5,9 @@ import { defineConfig } from 'vite';
 // The 3D fly-through is a separate web app: its page and baked terrain live
 // in tools/flythrough/, its code in src/flythrough/, and it reads trail and
 // hike data straight from src/data so editor changes flow through.
+//
+// It ships with the main site at /3dtour/: `npm run build` builds the PWA into
+// dist/ first (which empties dist/), then this app into dist/3dtour/.
 const root = import.meta.dirname;
 
 export default defineConfig({
@@ -16,8 +19,8 @@ export default defineConfig({
 	server: { host: true, port: 4175, strictPort: true, fs: { allow: [root] } },
 	preview: { host: true, port: 4176 },
 	build: {
-		outDir: resolve(root, '.flythrough-dist'),
+		outDir: resolve(root, 'dist/3dtour'),
 		emptyOutDir: true,
-		chunkSizeWarningLimit: 900,
+		chunkSizeWarningLimit: 1200,
 	},
 });
